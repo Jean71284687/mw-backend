@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+   th:replace="~{fragments/dashboard-layout :: dashboardLayout('Gestión de Órdenes', '/css/dashboard-ordenes.css', '/js/dashboard-ordenes.js', ~{::main-content})}">
+
+<body>
+   <!-- Contenido principal que se inyectará en el slot -->
+   <div th:fragment="main-content">
+
+      <!-- HEADER DE LA PÁGINA -->
+      <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+         <h2><i class="icon ion-md-cart me-2"></i>Gestión de Órdenes</h2>
+         <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="exportOrders()">
+               <i class="icon ion-md-download me-1"></i>Exportar
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+               <i class="icon ion-md-funnel me-1"></i>Filtros Avanzados
+            </button>
+         </div>
+      </div>
+
+      <!-- ESTADÍSTICAS DE ÓRDENES -->
+      <div class="row mb-4">
+         <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-primary text-white">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-1">Total Órdenes</h6>
+                        <h3 class="mb-0" th:text="${stats.total}">0</h3>
+                     </div>
+                     <div class="stats-icon">
+                        <i class="icon ion-md-stats"></i>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-warning text-white">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-1">Pendientes</h6>
+                        <h3 class="mb-0" th:text="${stats.pending}">0</h3>
+                     </div>
+                     <div class="stats-icon">
+                        <i class="icon ion-md-time"></i>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-success text-white">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-1">Completadas</h6>
+                        <h3 class="mb-0" th:text="${stats.completed}">0</h3>
+                     </div>
+                     <div class="stats-icon">
+                        <i class="icon ion-md-checkmark-circle"></i>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-danger text-white">
+               <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-1">Canceladas</h6>
+                        <h3 class="mb-0" th:text="${stats.cancelled}">0</h3>
+                     </div>
+                     <div class="stats-icon">
+                        <i class="icon ion-md-close-circle"></i>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- FILTROS Y BÚSQUEDA -->
+      <div class="card mb-4">
+         <div class="card-body">
+            <form method="get" th:action="@{/admin/dashboard/ordenes}">
+               <div class="row g-3">
+                  <div class="col-md-4">
+                     <div class="input-group">
+                        <span class="input-group-text"><i class="icon ion-md-search"></i></span>
+                        <input type="text" class="form-control" name="search" th:value="${search}"
+                           placeholder="Buscar por ID, cliente o email..." id="searchOrders">
+                     </div>
+                  </div>
+                  <div class="col-md-2">
+                     <select class="form-select" name="status" id="filterStatus">
+                        <option value="">Todos los estados</option>
+                        <option value="PENDING" th:selected="${status?.name() == 'PENDING'}">Pendiente</option>
+                        <option value="PROCESSING" th:selected="${status?.name() == 'PROCESSING'}">Procesando</option>
+                        <option value="SHIPPED" th:selected="${status?.name() == 'SHIPPED'}">Enviado</option>
+                        <option value="DELIVERED" th:selected="${status?.name() == 'DELIVERED'}">Entregado</option>
+                        <option value="CANCELLED" th:selected="${status?.name() == 'CANCELLED'}">Cancelado</option>
+                     </select>
+                  </div>
+                  <div class="col-md-2">
+                     <select class="form-select" name="payStatus" id="filterPayment">
+                        <option value="">Estado de pago</option>
+                        <option value="PAID" th:selected="${payStatus?.name() == 'PAID'}">Pagado</option>
+                        <option value="PENDING" th:selected="${payStatus?.name() == 'PENDING'}">Pendiente</option>
+                        <option value="FAILED" th:selected="${payStatus?.name() == 'FAILED'}">Fallido</option>
+                     </select>
+                  </div>
+                  <div class="col-md-2">
+                     <input type="date" class="form-control" name="dateFrom" th:value="${dateFrom}" id="filterDateFrom"
+                        placeholder="Desde">
+                  </div>
+                  <div class="col-md-2">
+                     <input type="date" class="form-control" name="dateTo" th:value="${dateTo}" id="filterDateTo"
+                        placeholder="Hasta">
+                  </div>
+                  <div class="col-12">
+                     <button type="submit" class="btn btn-primary">
+                        <i class="icon ion-md-funnel me-1"></i>Aplicar Filtros
+                     </button>
+                     <a th:href="@{/admin/dashboard/ordenes}" class="btn btn-outline-secondary">
+                        <i class="icon ion-md-refresh me-1"></i>Limpiar
+                     </a>
+                  </div>
+               </div>
+            </form>
+         </div>
+      </div>
+
+      <!-- LISTA DE ÓRDENES -->
+      <div class="card">
+         <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Lista de Órdenes</h5>
+            <span class="badge bg-secondary" th:text="${totalOrders} + ' órdenes totales'">0 órdenes totales</span>
+         </div>
+         <div class="card-body p-0">
+            <div class="table-responsive">
+               <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                     <tr>
+                        <th class="ps-3">ID Orden</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Pago</th>
+                        <th>Envío</th>
+                        <th class="text-center">Acciones</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <!-- Mensaje cuando no hay órdenes -->
+                     <tr th:if="${orders.empty}">
+                        <td colspan="8" class="text-center py-5">
+                           <i class="icon ion-md-information-circle" style="font-size: 3rem; opacity: 0.3;"></i>
+                           <p class="mb-0 mt-2 text-muted">No se encontraron órdenes</p>
+                        </td>
+                     </tr>
+
+                     <!-- Loop de órdenes -->
+                     <tr th:each="order : ${orders}" th:unless="${orders.empty}">
+                        <td class="ps-3">
+                           <strong class="text-primary" th:text="'#ORD-2024-' + ${order.id}">#ORD-2024-0</strong>
+                        </td>
+                        <td>
+                           <div class="d-flex align-items-center">
+                              <img src="https://via.placeholder.com/32" alt="Avatar" class="rounded-circle me-2"
+                                 width="32" height="32">
+                              <div>
+                                 <div class="fw-medium" th:text="${order.user.username}">Usuario</div>
+                                 <small class="text-muted" th:text="${order.user.email}">email@example.com</small>
+                              </div>
+                           </div>
+                        </td>
+                        <td>
+                           <div th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy')}">01/01/2024</div>
+                           <small class="text-muted" th:text="${#temporals.format(order.createdAt, 'hh:mm a')}">12:00
+                              PM</small>
+                        </td>
+                        <td>
+                           <strong th:text="'S/ ' + ${#numbers.formatDecimal(order.total, 1, 2)}">S/ 0.00</strong>
+                        </td>
+                        <td>
+                           <span class="badge"
+                              th:classappend="${order.orderStatus.name() == 'PENDING' ? 'bg-warning' : (order.orderStatus.name() == 'PAYED' ? 'bg-primary' : (order.orderStatus.name() == 'SENT' ? 'bg-info' : (order.orderStatus.name() == 'DELIVERED' ? 'bg-success' : (order.orderStatus.name() == 'CANCELED' ? 'bg-danger' : 'bg-secondary'))))}">
+                              <i class="icon"
+                                 th:classappend="${order.orderStatus.name() == 'PENDING' ? 'ion-md-time' : (order.orderStatus.name() == 'PAYED' ? 'ion-md-cube' : (order.orderStatus.name() == 'SENT' ? 'ion-md-send' : (order.orderStatus.name() == 'DELIVERED' ? 'ion-md-checkmark-circle' : (order.orderStatus.name() == 'CANCELED' ? 'ion-md-close-circle' : 'ion-md-help'))))}"></i>
+                              <span
+                                 th:text="${order.orderStatus.name() == 'PENDING' ? 'Pendiente' : (order.orderStatus.name() == 'PAYED' ? 'Pagado' : (order.orderStatus.name() == 'SENT' ? 'En tránsito' : (order.orderStatus.name() == 'DELIVERED' ? 'Entregado' : (order.orderStatus.name() == 'CANCELED' ? 'Cancelado' : 'Desconocido'))))}">
+                                 Estado
+                              </span>
+                           </span>
+                        </td>
+                        <td>
+                           <span class="badge"
+                              th:classappend="${order.pay != null && order.pay.payStatus.name() == 'PAID' ? 'bg-success' : (order.pay != null && order.pay.payStatus.name() == 'PENDING' ? 'bg-warning' : (order.pay != null && order.pay.payStatus.name() == 'FAILED' ? 'bg-danger' : 'bg-secondary'))}">
+                              <i class="icon"
+                                 th:classappend="${order.pay != null && order.pay.payStatus.name() == 'PAID' ? 'ion-md-checkmark' : (order.pay != null && order.pay.payStatus.name() == 'PENDING' ? 'ion-md-time' : (order.pay != null && order.pay.payStatus.name() == 'FAILED' ? 'ion-md-close' : 'ion-md-help'))}"></i>
+                              <span
+                                 th:text="${order.pay != null && order.pay.payStatus.name() == 'PAID' ? 'Pagado' : (order.pay != null && order.pay.payStatus.name() == 'PENDING' ? 'Pendiente' : (order.pay != null && order.pay.payStatus.name() == 'FAILED' ? 'Fallido' : 'N/A'))}">
+                                 Pago
+                              </span>
+                           </span>
+                        </td>
+                        <td>
+                           <span class="badge"
+                              th:classappend="${order.shipment != null && order.shipment.shippingStatus.name() == 'DELIVERED' ? 'bg-success' : (order.shipment != null && order.shipment.shippingStatus.name() == 'WAITING' ? 'bg-info' : (order.shipment != null && order.shipment.shippingStatus.name() == 'PENDING' ? 'bg-secondary' : 'bg-secondary'))}">
+                              <i class="icon"
+                                 th:classappend="${order.shipment != null && order.shipment.shippingStatus.name() == 'DELIVERED' ? 'ion-md-checkmark' : (order.shipment != null && order.shipment.shippingStatus.name() == 'WAITING' ? 'ion-md-send' : 'ion-md-time')}"></i>
+                              <span
+                                 th:text="${order.shipment != null && order.shipment.shippingStatus.name() == 'DELIVERED' ? 'Entregado' : (order.shipment != null && order.shipment.shippingStatus.name() == 'WAITING' ? 'En tránsito' : (order.shipment != null && order.shipment.shippingStatus.name() == 'PENDING' ? 'Pendiente' : 'N/A'))}">
+                                 Envío
+                              </span>
+                           </span>
+                        </td>
+                        <td class="text-center">
+                           <div class="btn-group btn-group-sm">
+                              <button class="btn btn-outline-primary" title="Ver detalles" data-bs-toggle="modal"
+                                 data-bs-target="#orderDetailModal"
+                                 th:onclick="'viewOrderDetails(' + ${order.id} + ')'">
+                                 <i class="icon ion-md-eye"></i>
+                              </button>
+                              <button class="btn btn-outline-success" title="Actualizar estado">
+                                 <i class="icon ion-md-create"></i>
+                              </button>
+                              <button class="btn btn-outline-secondary" title="Imprimir">
+                                 <i class="icon ion-md-print"></i>
+                              </button>
+                           </div>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+         <div class="card-footer">
+            <!-- Paginación -->
+            <nav aria-label="Paginación de órdenes" th:if="${totalPages > 0}">
+               <ul class="pagination justify-content-center mb-0">
+                  <!-- Botón Anterior -->
+                  <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                     <a class="page-link"
+                        th:href="${currentPage > 0} ? @{/admin/dashboard/ordenes(page=${currentPage - 1}, search=${search}, status=${status}, payStatus=${payStatus}, dateFrom=${dateFrom}, dateTo=${dateTo})} : '#'"
+                        tabindex="-1">
+                        Anterior
+                     </a>
+                  </li>
+
+                  <!-- Números de página -->
+                  <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                     th:if="${pageNum == 0 || pageNum == totalPages - 1 || (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)}"
+                     th:classappend="${pageNum == currentPage} ? 'active'">
+                     <a class="page-link"
+                        th:href="@{/admin/dashboard/ordenes(page=${pageNum}, search=${search}, status=${status}, payStatus=${payStatus}, dateFrom=${dateFrom}, dateTo=${dateTo})}"
+                        th:text="${pageNum + 1}">1</a>
+                  </li>
+
+                  <!-- Botón Siguiente -->
+                  <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                     <a class="page-link"
+                        th:href="${currentPage < totalPages - 1} ? @{/admin/dashboard/ordenes(page=${currentPage + 1}, search=${search}, status=${status}, payStatus=${payStatus}, dateFrom=${dateFrom}, dateTo=${dateTo})} : '#'">
+                        Siguiente
+                     </a>
+                  </li>
+               </ul>
+            </nav>
+
+            <!-- Mensaje cuando no hay páginas -->
+            <div class="text-center text-muted" th:if="${totalPages == 0}">
+               <small>No hay resultados para mostrar</small>
+            </div>
+         </div>
+      </div>
+
+      <!-- Modal de Detalles de Orden -->
+      <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel"
+         aria-hidden="true">
+         <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+               <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="orderDetailModalLabel">
+                     <i class="icon ion-md-document me-2"></i>Detalles de Orden #ORD-2024-1001
+                  </h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                     aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  <!-- Información del cliente -->
+                  <div class="row mb-4">
+                     <div class="col-md-6">
+                        <h6 class="text-muted mb-3">INFORMACIÓN DEL CLIENTE</h6>
+                        <p class="mb-1"><strong>Nombre:</strong> Juan Pérez</p>
+                        <p class="mb-1"><strong>Email:</strong> juan@mail.com</p>
+                        <p class="mb-1"><strong>Teléfono:</strong> +51 987 654 321</p>
+                     </div>
+                     <div class="col-md-6">
+                        <h6 class="text-muted mb-3">DIRECCIÓN DE ENVÍO</h6>
+                        <p class="mb-1">Av. Principal 123, Dpto 456</p>
+                        <p class="mb-1">Lima, Lima</p>
+                        <p class="mb-1">Perú - 15001</p>
+                     </div>
+                  </div>
+
+                  <hr>
+
+                  <!-- Estado de la orden -->
+                  <div class="mb-4">
+                     <h6 class="text-muted mb-3">ESTADO DE LA ORDEN</h6>
+                     <div class="row">
+                        <div class="col-md-4">
+                           <label class="form-label">Estado de Orden:</label>
+                           <select class="form-select form-select-sm">
+                              <option>Pendiente</option>
+                              <option selected>Procesando</option>
+                              <option>Enviado</option>
+                              <option>Entregado</option>
+                              <option>Cancelado</option>
+                           </select>
+                        </div>
+                        <div class="col-md-4">
+                           <label class="form-label">Estado de Pago:</label>
+                           <select class="form-select form-select-sm">
+                              <option selected>Pagado</option>
+                              <option>Pendiente</option>
+                              <option>Fallido</option>
+                           </select>
+                        </div>
+                        <div class="col-md-4">
+                           <label class="form-label">Estado de Envío:</label>
+                           <select class="form-select form-select-sm">
+                              <option>Pendiente</option>
+                              <option>Preparando</option>
+                              <option selected>En tránsito</option>
+                              <option>Entregado</option>
+                           </select>
+                        </div>
+                     </div>
+                  </div>
+
+                  <hr>
+
+                  <!-- Productos de la orden -->
+                  <h6 class="text-muted mb-3">PRODUCTOS</h6>
+                  <div class="table-responsive">
+                     <table class="table table-sm">
+                        <thead>
+                           <tr>
+                              <th>Producto</th>
+                              <th class="text-center">Cantidad</th>
+                              <th class="text-end">Precio Unit.</th>
+                              <th class="text-end">Subtotal</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr>
+                              <td>
+                                 <div class="d-flex align-items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Producto" class="me-2" width="40">
+                                    <span>Camisa Formal Azul</span>
+                                 </div>
+                              </td>
+                              <td class="text-center">2</td>
+                              <td class="text-end">S/ 89.90</td>
+                              <td class="text-end"><strong>S/ 179.80</strong></td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <div class="d-flex align-items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Producto" class="me-2" width="40">
+                                    <span>Pantalón Jeans Classic</span>
+                                 </div>
+                              </td>
+                              <td class="text-center">1</td>
+                              <td class="text-end">S/ 129.90</td>
+                              <td class="text-end"><strong>S/ 129.90</strong></td>
+                           </tr>
+                           <tr>
+                              <td>
+                                 <div class="d-flex align-items-center">
+                                    <img src="https://via.placeholder.com/40" alt="Producto" class="me-2" width="40">
+                                    <span>Zapatos Casuales</span>
+                                 </div>
+                              </td>
+                              <td class="text-center">1</td>
+                              <td class="text-end">S/ 150.20</td>
+                              <td class="text-end"><strong>S/ 150.20</strong></td>
+                           </tr>
+                        </tbody>
+                        <tfoot>
+                           <tr>
+                              <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                              <td class="text-end"><strong>S/ 459.90</strong></td>
+                           </tr>
+                           <tr>
+                              <td colspan="3" class="text-end">Envío:</td>
+                              <td class="text-end">S/ 0.00</td>
+                           </tr>
+                           <tr class="table-active">
+                              <td colspan="3" class="text-end"><strong>TOTAL:</strong></td>
+                              <td class="text-end"><strong class="text-primary fs-5">S/ 459.90</strong></td>
+                           </tr>
+                        </tfoot>
+                     </table>
+                  </div>
+
+                  <!-- Notas adicionales -->
+                  <div class="mt-3">
+                     <h6 class="text-muted mb-2">NOTAS</h6>
+                     <textarea class="form-control" rows="3" placeholder="Agregar notas sobre la orden..."></textarea>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  <button type="button" class="btn btn-outline-primary">
+                     <i class="icon ion-md-print me-1"></i>Imprimir
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                     <i class="icon ion-md-save me-1"></i>Guardar Cambios
+                  </button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Modal de Filtros Avanzados -->
+      <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="filterModalLabel">
+                     <i class="icon ion-md-funnel me-2"></i>Filtros Avanzados
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  <div class="mb-3">
+                     <label class="form-label">Rango de precio</label>
+                     <div class="row g-2">
+                        <div class="col">
+                           <input type="number" class="form-control" placeholder="Mínimo">
+                        </div>
+                        <div class="col">
+                           <input type="number" class="form-control" placeholder="Máximo">
+                        </div>
+                     </div>
+                  </div>
+                  <div class="mb-3">
+                     <label class="form-label">Método de pago</label>
+                     <select class="form-select">
+                        <option value="">Todos</option>
+                        <option>Tarjeta de crédito</option>
+                        <option>Tarjeta de débito</option>
+                        <option>PayPal</option>
+                        <option>Transferencia</option>
+                     </select>
+                  </div>
+                  <div class="mb-3">
+                     <label class="form-label">Tipo de cliente</label>
+                     <select class="form-select">
+                        <option value="">Todos</option>
+                        <option>Nuevo</option>
+                        <option>Recurrente</option>
+                        <option>VIP</option>
+                     </select>
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-outline-danger">Limpiar Filtros</button>
+                  <button type="button" class="btn btn-primary">Aplicar Filtros</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+   </div>
+</body>
+
+</html>

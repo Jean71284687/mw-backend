@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+	<!-- Scripts al final del body -->
+	<div th:fragment="scripts(extraJs)">
+		<!-- Bootstrap JS -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+			crossorigin="anonymous"></script>
+
+		<!-- jQuery (si lo necesitas) -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+		<!-- JavaScript global -->
+		<script th:src="@{/js/main.js}"></script>
+
+		<!-- JavaScript del navbar -->
+		<script th:src="@{/js/navbar.js}"></script>
+
+		<!-- JavaScript del Register Modal -->
+		<script th:src="@{/js/register-modal.js}"></script>
+
+		<!-- JavaScript del Login Modal -->
+		<script th:src="@{/js/login-modal.js}"></script>
+
+		<!-- JavaScript del Cart Local (localStorage) -->
+		<script th:src="@{/js/cart-local.js}"></script>
+
+		<!-- JavaScript específico de página -->
+		<th:block th:if="${extraJs}">
+			<script th:each="js : ${extraJs}" th:src="@{${js}}"></script>
+		</th:block>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,276 @@
+/* ============================================
+ * DASHBOARD - GESTIÓN DE ÓRDENES
+ * ============================================ */
+
+/* Stats Cards */
+.stats-card {
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	border: none;
+}
+
+.stats-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.stats-card .card-body {
+	padding: 1.5rem;
+}
+
+.stats-card h6 {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.5rem;
+}
+
+.stats-card h3 {
+	font-size: 2rem;
+	font-weight: 700;
+	margin: 0;
+}
+
+.stats-icon {
+	font-size: 3rem;
+	opacity: 0.3;
+}
+
+/* Tabla de órdenes */
+.table-hover tbody tr {
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+	background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table thead th {
+	font-weight: 600;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	letter-spacing: 0.5px;
+	color: #6c757d;
+	border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+	vertical-align: middle;
+	padding: 1rem 0.75rem;
+}
+
+/* Badges personalizados */
+.badge {
+	padding: 0.4rem 0.8rem;
+	font-weight: 500;
+	font-size: 0.75rem;
+}
+
+.badge i {
+	font-size: 0.875rem;
+	margin-right: 0.25rem;
+}
+
+/* Avatar en tabla */
+.table img.rounded-circle {
+	border: 2px solid #fff;
+	box-shadow: 0 0 0 1px #dee2e6;
+}
+
+/* Botones de acción */
+.btn-group-sm .btn {
+	padding: 0.25rem 0.5rem;
+	font-size: 0.875rem;
+}
+
+/* Cards */
+.card {
+	border: none;
+	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+	margin-bottom: 1.5rem;
+}
+
+.card-header {
+	background-color: #f8f9fa;
+	border-bottom: 1px solid #dee2e6;
+	padding: 1rem 1.5rem;
+	font-weight: 600;
+}
+
+/* Modal personalizado */
+.modal-header {
+	border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-header.bg-primary {
+	background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.modal-body h6 {
+	color: #6c757d;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	font-weight: 600;
+	margin-bottom: 1rem;
+}
+
+.modal-body p {
+	margin-bottom: 0.5rem;
+	color: #495057;
+}
+
+.modal-body hr {
+	margin: 1.5rem 0;
+	opacity: 0.1;
+}
+
+/* Tabla de productos en modal */
+.modal-body .table-sm td,
+.modal-body .table-sm th {
+	padding: 0.5rem;
+}
+
+.modal-body .table-sm img {
+	border-radius: 0.25rem;
+}
+
+.modal-body .table tfoot {
+	border-top: 2px solid #dee2e6;
+}
+
+/* Input groups */
+.input-group-text {
+	background-color: #f8f9fa;
+	border-color: #ced4da;
+}
+
+/* Filters card */
+.card-body .row.g-3 {
+	row-gap: 1rem;
+}
+
+/* Select personalizado */
+.form-select,
+.form-control {
+	border-color: #ced4da;
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-select:focus,
+.form-control:focus {
+	border-color: #86b7fe;
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Paginación */
+.pagination {
+	margin-bottom: 0;
+}
+
+.page-link {
+	color: #0d6efd;
+	border-color: #dee2e6;
+}
+
+.page-link:hover {
+	background-color: #e9ecef;
+	border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.stats-card h3 {
+		font-size: 1.5rem;
+	}
+
+	.stats-icon {
+		font-size: 2rem;
+	}
+
+	.table-responsive {
+		font-size: 0.875rem;
+	}
+
+	.btn-group-sm .btn {
+		padding: 0.2rem 0.4rem;
+	}
+
+	.card-body .row.g-3 > div {
+		margin-bottom: 0.75rem;
+	}
+}
+
+/* Animaciones */
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.card {
+	animation: slideIn 0.3s ease-out;
+}
+
+/* Estado de orden colores */
+.badge.bg-warning {
+	background-color: #ffc107 !important;
+	color: #000;
+}
+
+.badge.bg-info {
+	background-color: #0dcaf0 !important;
+	color: #000;
+}
+
+/* Tooltips y popovers */
+.btn[title] {
+	position: relative;
+}
+
+/* Print styles */
+@media print {
+	.btn,
+	.pagination,
+	.card-header,
+	.modal-footer {
+		display: none !important;
+	}
+
+	.table {
+		font-size: 10pt;
+	}
+
+	.card {
+		box-shadow: none;
+		border: 1px solid #dee2e6;
+	}
+}
+
+/* Scrollbar personalizado para modal */
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar {
+	width: 8px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 4px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}

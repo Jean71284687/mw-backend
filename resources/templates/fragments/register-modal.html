@@ -1,0 +1,184 @@
+<!-- Modal de Registro -->
+<div th:fragment="registerModal" class="modal fade register-modal" id="registerModal" tabindex="-1"
+   aria-labelledby="registerModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+         <!-- Header -->
+         <div class="modal-header">
+            <h5 class="modal-title" id="registerModalLabel">
+               <i class="bi bi-person-plus-fill me-2"></i>Crea tu Cuenta en MODATEC
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+               aria-label="Cerrar"></button>
+         </div>
+
+         <!-- Body -->
+         <div class="modal-body">
+            <!-- Benefits Box -->
+            <div class="benefits-box">
+               <h6 class="fw-bold mb-3 text-center" style="color: #667eea;">
+                  <i class="bi bi-star-fill text-warning me-2"></i>Beneficios de Registrarte
+               </h6>
+               <div class="row">
+                  <div class="col-md-6">
+                     <div class="benefit-item">
+                        <i class="bi bi-lightning-fill"></i>
+                        <span>Compras rápidas y seguras</span>
+                     </div>
+                     <div class="benefit-item">
+                        <i class="bi bi-truck"></i>
+                        <span>Seguimiento de pedidos</span>
+                     </div>
+                  </div>
+                  <div class="col-md-6">
+                     <div class="benefit-item">
+                        <i class="bi bi-gift-fill"></i>
+                        <span>Ofertas exclusivas</span>
+                     </div>
+                     <div class="benefit-item">
+                        <i class="bi bi-heart-fill"></i>
+                        <span>Lista de favoritos</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- Form -->
+            <form th:action="@{/web/auth/register}" method="post" id="registerForm">
+
+               <!-- Messages Section -->
+               <div id="registerError" class="alert alert-danger d-flex align-items-center d-none" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <span id="registerErrorMessage"></span>
+               </div>
+
+               <div class="row g-3">
+                  <!-- Nombres -->
+                  <div class="col-md-6">
+                     <label for="registerFirstName" class="form-label">
+                        <i class="bi bi-person me-1"></i>Nombres
+                     </label>
+                     <input type="text" class="form-control" id="registerFirstName" name="name"
+                        placeholder="Ej. Juan Carlos" required>
+                     <div class="invalid-feedback" id="nameError"></div>
+                  </div>
+
+                  <!-- Apellidos -->
+                  <div class="col-md-6">
+                     <label for="registerLastName" class="form-label">
+                        <i class="bi bi-person me-1"></i>Apellidos
+                     </label>
+                     <input type="text" class="form-control" id="registerLastName" name="lastName"
+                        placeholder="Ej. Pérez García" required>
+                     <div class="invalid-feedback" id="lastNameError"></div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-12">
+                     <label for="registerEmail" class="form-label">
+                        <i class="bi bi-envelope me-1"></i>Correo Electrónico
+                     </label>
+                     <input type="email" class="form-control" id="registerEmail" name="email"
+                        placeholder="tucorreo@email.com" required>
+                     <div class="invalid-feedback" id="emailErrorRegister"></div>
+                     <div class="info-text">
+                        <i class="bi bi-info-circle me-1"></i>Usaremos este correo para confirmar tu cuenta
+                     </div>
+                  </div>
+
+                  <!-- Celular -->
+                  <div class="col-md-6">
+                     <label for="registerPhone" class="form-label">
+                        <i class="bi bi-phone me-1"></i>Celular
+                     </label>
+                     <input type="tel" class="form-control" id="registerPhone" name="cel" pattern="[0-9]{9,15}"
+                        placeholder="987654321" required>
+                     <div class="invalid-feedback" id="celError"></div>
+                     <div class="info-text">
+                        <i class="bi bi-info-circle me-1"></i>9 a 15 dígitos sin espacios
+                     </div>
+                  </div>
+
+                  <!-- Dirección -->
+                  <div class="col-md-6">
+                     <label for="registerAddress" class="form-label">
+                        <i class="bi bi-geo-alt me-1"></i>Dirección
+                     </label>
+                     <input type="text" class="form-control" id="registerAddress" name="address"
+                        placeholder="Calle, número, distrito" required>
+                     <div class="invalid-feedback" id="addressError"></div>
+                  </div>
+
+                  <!-- Password -->
+                  <div class="col-md-6">
+                     <label for="registerPassword" class="form-label">
+                        <i class="bi bi-lock me-1"></i>Contraseña
+                     </label>
+                     <div class="input-group">
+                        <input type="password" class="form-control" id="registerPassword" name="password"
+                           placeholder="Mínimo 8 caracteres" required minlength="8">
+                        <button type="button" class="btn" id="toggleRegisterPassword">
+                           <i class="bi bi-eye"></i>
+                        </button>
+                     </div>
+                     <div class="invalid-feedback" id="passwordErrorRegister"></div>
+                     <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                     </div>
+                     <div class="info-text" id="passwordStrengthText">
+                        <i class="bi bi-shield-check me-1"></i>Usa letras, números y símbolos
+                     </div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div class="col-md-6">
+                     <label for="registerConfirmPassword" class="form-label">
+                        <i class="bi bi-lock-fill me-1"></i>Confirmar Contraseña
+                     </label>
+                     <div class="input-group">
+                        <input type="password" class="form-control" id="registerConfirmPassword" name="confirmPassword"
+                           placeholder="Repite tu contraseña" required>
+                        <button type="button" class="btn" id="toggleConfirmPassword">
+                           <i class="bi bi-eye"></i>
+                        </button>
+                     </div>
+                     <div class="info-text text-danger d-none" id="passwordMatchError">
+                        <i class="bi bi-x-circle me-1"></i>Las contraseñas no coinciden
+                     </div>
+                  </div>
+
+                  <!-- Terms -->
+                  <div class="col-12">
+                     <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                        <label class="form-check-label" for="acceptTerms">
+                           Acepto los <a href="#" style="color: #667eea;">Términos y Condiciones</a> y la
+                           <a href="#" style="color: #667eea;">Política de Privacidad</a>
+                        </label>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- Footer Buttons -->
+               <div class="mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <button type="submit" class="btn btn-register-submit">
+                     <i class="bi bi-check-circle me-2"></i>Crear Mi Cuenta
+                  </button>
+                  <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
+                     <i class="bi bi-x-circle me-2"></i>Cancelar
+                  </button>
+               </div>
+
+               <!-- Login Link -->
+               <div class="text-center mt-3">
+                  <small class="text-muted">
+                     ¿Ya tienes cuenta?
+                     <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal"
+                        style="color: #667eea; font-weight: 600;">Inicia Sesión</a>
+                  </small>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>

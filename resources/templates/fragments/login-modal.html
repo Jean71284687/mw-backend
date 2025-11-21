@@ -1,0 +1,70 @@
+<!-- Modal de Login -->
+<div th:fragment="loginModal" class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel"
+   aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+         <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="loginModalLabel">
+               <i class="bi bi-person-circle me-2"></i>Iniciar Sesión
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+               aria-label="Cerrar"></button>
+         </div>
+         <div class="modal-body p-4">
+            <form id="loginForm" action="/web/auth/login" method="post">
+
+               <!-- Messages Section -->
+               <div id="loginError" class="alert alert-danger d-flex align-items-center d-none" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <span id="loginErrorMessage"></span>
+               </div>
+
+               <div class="mb-3">
+                  <label for="loginEmail" class="form-label">
+                     <i class="bi bi-envelope me-1"></i>Email
+                  </label>
+                  <input type="email" class="form-control" id="loginEmail" name="email" placeholder="tu@email.com"
+                     required>
+                  <div class="invalid-feedback" id="emailError"></div>
+               </div>
+
+               <div class="mb-3">
+                  <label for="loginPassword" class="form-label">
+                     <i class="bi bi-lock me-1"></i>Contraseña
+                  </label>
+                  <div class="input-group">
+                     <input type="password" class="form-control" id="loginPassword" name="password"
+                        placeholder="Tu contraseña" required>
+                     <button type="button" class="btn btn-outline-secondary" id="toggleLoginPassword">
+                        <i class="bi bi-eye"></i>
+                     </button>
+                  </div>
+                  <div class="invalid-feedback" id="passwordError"></div>
+               </div>
+
+               <div class="mb-3 form-check">
+                  <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                  <label class="form-check-label" for="rememberMe">
+                     Recordarme
+                  </label>
+               </div>
+
+               <div class="d-grid mb-3">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                     <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                  </button>
+               </div>
+
+               <!-- Enlace a registro -->
+               <div class="text-center">
+                  <p class="text-muted mb-0">
+                     ¿No tienes cuenta?
+                     <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal"
+                        class="text-primary fw-bold">Regístrate aquí</a>
+                  </p>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>

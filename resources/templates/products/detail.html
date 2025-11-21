@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(${product.name} + ' - MODATEC', '/css/products.css', null)}"></head>
+
+<body>
+	<!-- Navbar -->
+	<div
+		th:replace="~{fragments/navbar :: navbar('products', ${categories}, ${cartCount}, ${isAuthenticated}, ${username})}">
+	</div>
+
+	<div class="container-fluid mt-4 fade-in">
+		<div class="row">
+			<!-- Imagen del producto -->
+			<div class="col-lg-6">
+				<div class="card shadow-hover">
+					<div class="card-body p-4 text-center">
+						<img
+							th:src="${product.detailProduct?.imageUrl != null ? product.detailProduct.imageUrl : '/images/no-image.png'}"
+							class="img-fluid rounded" style="max-height: 400px; object-fit: contain"
+							th:alt="${product.name}" />
+					</div>
+				</div>
+			</div>
+
+			<!-- Información del producto - MISMO DISEÑO que list.html -->
+			<div class="col-lg-6">
+				<div class="card shadow-hover">
+					<div class="card-body">
+						<!-- Header con badges - MISMO que list.html -->
+						<div class="position-relative mb-3">
+							<!-- Badge de condición - MISMO -->
+							<span class="badge position-absolute top-0 start-0 product-badge"
+								th:classappend="${product.productCondition.name() == 'NEW'} ? 'bg-success' :
+                                               (${product.productCondition.name() == 'LIKE_NEW'} ? 'bg-info' :
+                                               (${product.productCondition.name() == 'REFURBISHED'} ? 'bg-warning' : 'bg-secondary'))"
+								th:text="${product.productCondition.name() == 'NEW'} ? 'Nuevo' :
+                                         (${product.productCondition.name() == 'LIKE_NEW'} ? 'Como nuevo' :
+                                         (${product.productCondition.name() == 'REFURBISHED'} ? 'Reacondicionado' : 'Usado'))">
+							</span>
+
+							<!-- Badge de stock - MISMO -->
+							<span th:if="${product.stock <= 5 and product.stock > 0}"
+								class="badge bg-danger position-absolute top-0 end-0">
+								¡Últimas <span th:text="${product.stock}"></span>!
+							</span>
+							<span th:if="${product.stock == 0}" class="badge bg-dark position-absolute top-0 end-0">
+								Sin stock
+							</span>
+						</div>
+
+						<!-- Nombre del producto -->
+						<h1 class="h4 fw-bold mb-2" th:text="${product.name}"></h1>
+						<h6 class="text-muted mb-3" th:text="${product.detailProduct?.commercialName}"></h6>
+
+						<!-- Información adicional - MISMO que list.html -->
+						<div class="mb-2">
+							<small class="text-muted d-block">
+								<i class="fas fa-barcode"></i> Código: <span th:text="${product.code}"></span>
+							</small>
+							<small class="text-muted d-block">
+								<i class="fas fa-boxes"></i> Stock: <span th:text="${product.stock}"></span>
+							</small>
+							<small class="text-muted d-block" th:if="${product.detailProduct?.brand}">
+								<i class="fas fa-tag"></i> <span th:text="${product.detailProduct.brand}"></span>
+							</small>
+						</div>
+
+						<!-- Descripción -->
+						<p class="card-text text-muted small mb-3 flex-grow-1" th:text="${product.detailProduct?.description != null ?
+                                   product.detailProduct.description : 'Sin descripción'}"></p>
+
+						<!-- Precio - MISMO sistema que list.html -->
+						<div class="mb-3" th:if="${product.detailProduct?.price}">
+							<div th:if="${product.detailProduct.discount > 0}">
+								<span class="original-price"
+									th:text="'S/ ' + ${#numbers.formatDecimal(product.detailProduct.price, 1, 2)}"></span>
+								<div class="price"
+									th:text="'S/ ' + ${#numbers.formatDecimal(product.detailProduct.price * (1 - product.detailProduct.discount / 100.0), 1, 2)}">
+								</div>
+								<small class="text-success">
+									<i class="fas fa-percent"></i>
+									<span th:text="${product.detailProduct.discount}"></span>% descuento
+								</small>
+							</div>
+							<div th:if="${product.detailProduct.discount == 0}">
+								<div class="price"
+									th:text="'S/ ' + ${#numbers.formatDecimal(product.detailProduct.price, 1, 2)}"></div>
+							</div>
+						</div>
+
+						<!-- Botones - MISMO diseño que list.html -->
+						<div class="mt-auto">
+							<div class="row g-2">
+								<div class="col-6">
+									<form id="addToCartForm" th:action="@{/web/cart/add}" method="post"
+										th:if="${product.stock > 0}">
+										<input type="hidden" name="productId" th:value="${product.id}" />
+										<input type="hidden" name="quantity" id="quantity" value="1" />
+										<input type="hidden" name="returnUrl"
+											th:value="@{/web/products/detail/{id}(id=${product.id})}" />
+										<button type="submit" class="btn btn-outline-success btn-sm w-100">
+											<i class="fas fa-cart-plus"></i> Agregar al carrito
+										</button>
+									</form>
+									<button th:if="${product.stock == 0}" class="btn btn-secondary btn-sm w-100" disabled>
+										<i class="fas fa-times"></i> Sin stock
+									</button>
+								</div>
+								<div class="col-6">
+									<a th:href="@{/web/products}" class="btn btn-outline-primary btn-sm w-100">
+										<i class="fas fa-arrow-left"></i> Seguir comprando
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Especificaciones adicionales -->
+				<div class="card shadow-hover mt-3">
+					<div class="card-body">
+						<h6 class="fw-bold">Especificaciones:</h6>
+						<p class="text-muted small mb-0" th:text="${product.detailProduct?.specifications != null ?
+                                   product.detailProduct.specifications : 'No hay especificaciones disponibles'}"></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Productos relacionados - MISMO diseño que list.html -->
+		<div class="row mt-5" th:if="${not #lists.isEmpty(relatedProducts)}">
+			<div class="col-12">
+				<h3 class="mb-4">Productos Relacionados</h3>
+				<div class="row">
+					<div class="col-md-3 mb-4" th:each="related : ${relatedProducts}">
+						<div class="card product-card h-100 shadow-hover">
+							<div class="position-relative">
+								<img
+									th:src="${related.detailProduct?.imageUrl != null ? related.detailProduct.imageUrl : '/images/no-image.png'}"
+									class="card-img-top product-image" th:alt="${related.name}" />
+								<!-- MISMO badge de condición -->
+								<span class="badge position-absolute top-0 start-0 m-2 product-badge"
+									th:classappend="${related.productCondition.name() == 'NEW'} ? 'bg-success' :
+                                                   (${related.productCondition.name() == 'LIKE_NEW'} ? 'bg-info' :
+                                                   (${related.productCondition.name() == 'REFURBISHED'} ? 'bg-warning' : 'bg-secondary'))"
+									th:text="${related.productCondition.name() == 'NEW'} ? 'Nuevo' :
+                                             (${related.productCondition.name() == 'LIKE_NEW'} ? 'Como nuevo' :
+                                             (${related.productCondition.name() == 'REFURBISHED'} ? 'Reacondicionado' : 'Usado'))">
+								</span>
+								<!-- MISMO badge de stock -->
+								<span th:if="${related.stock <= 5 and related.stock > 0}"
+									class="badge bg-danger position-absolute top-0 end-0 m-2 product-badge">
+									¡Últimas <span th:text="${related.stock}"></span>!
+								</span>
+							</div>
+							<div class="card-body d-flex flex-column">
+								<h6 class="card-title fw-bold" th:text="${related.name}"></h6>
+								<p class="card-text text-muted small flex-grow-1 text-truncate-3" th:text="${related.detailProduct?.description != null ?
+                                           (related.detailProduct.description.length() > 80 ?
+                                            related.detailProduct.description.substring(0, 80) + '...' :
+                                            related.detailProduct.description) : 'Sin descripción'}"></p>
+
+								<div class="mb-2">
+									<small class="text-muted d-block">
+										<i class="fas fa-barcode"></i> <span th:text="${related.code}"></span>
+									</small>
+									<small class="text-muted d-block">
+										<i class="fas fa-boxes"></i> Stock: <span th:text="${related.stock}"></span>
+									</small>
+								</div>
+
+								<!-- MISMO sistema de precios -->
+								<div class="mb-3" th:if="${related.detailProduct?.price}">
+									<div th:if="${related.detailProduct.discount > 0}">
+										<span class="original-price" th:text="'S/ ' + ${related.detailProduct.price}"></span>
+										<div class="price"
+											th:text="'S/ ' + ${#numbers.formatDecimal(related.detailProduct.price * (1 - related.detailProduct.discount / 100.0), 1, 2)}">
+										</div>
+									</div>
+									<div th:if="${related.detailProduct.discount == 0}">
+										<div class="price"
+											th:text="'S/ ' + ${#numbers.formatDecimal(related.detailProduct.price, 1, 2)}"></div>
+									</div>
+								</div>
+
+								<!-- MISMO botón -->
+								<div class="mt-auto">
+									<a th:href="@{/web/products/detail/{id}(id=${related.id})}"
+										class="btn btn-primary btn-sm w-100 mb-2">
+										<i class="fas fa-eye"></i> Ver detalles
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<div th:replace="~{fragments/login-modal :: loginModal}"></div>
+	<div th:replace="~{fragments/register-modal :: registerModal}"></div>
+	<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+	<!-- Cart Local Script -->
+	<script th:src="@{/js/cart-local.js}"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		// Variables desde Thymeleaf
+		const isAuthenticated = /*[[${isAuthenticated}]]*/ false;
+		const productData = {
+			id: /*[[${product.id}]]*/ 0,
+			name: /*[[${product.name}]]*/ '',
+			price: /*[[${product.detailProduct.price}]]*/ 0,
+			discount: /*[[${product.detailProduct.discount}]]*/ 0,
+			imageUrl: /*[[${product.detailProduct.imageUrl}]]*/ '',
+			stock: /*[[${product.stock}]]*/ 0
+		};
+
+		// Manejar el formulario de agregar al carrito
+		document.addEventListener('DOMContentLoaded', function () {
+			const addToCartForm = document.getElementById('addToCartForm');
+
+			if (addToCartForm) {
+				addToCartForm.addEventListener('submit', function (e) {
+					e.preventDefault();
+
+					const quantity = parseInt(document.getElementById('quantity').value);
+
+					// Validar stock
+					if (quantity > productData.stock) {
+						alert('La cantidad solicitada excede el stock disponible');
+						return;
+					}
+
+					if (isAuthenticated) {
+						// Usuario autenticado: enviar al servidor
+						this.submit();
+					} else {
+						// Usuario no autenticado: guardar en localStorage
+						const success = CartLocal.addItem(
+							productData.id,
+							productData.name,
+							productData.price,
+							productData.discount,
+							productData.imageUrl,
+							quantity
+						);
+
+						if (success) {
+							// Mostrar mensaje de éxito
+							const alert = document.createElement('div');
+							alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+							alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+							alert.innerHTML = `
+								<i class="fas fa-check-circle"></i> Producto agregado al carrito
+								<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+							`;
+							document.body.appendChild(alert);
+
+							// Remover después de 3 segundos
+							setTimeout(() => {
+								alert.remove();
+							}, 3000);
+
+							// Preguntar si quiere ver el carrito o seguir comprando
+							if (confirm('¿Deseas ver tu carrito de compras?')) {
+								window.location.href = '/web/cart';
+							}
+						}
+					}
+				});
+			}
+		});
+		/*]]>*/
+	</script>
+</body>
+
+</html>

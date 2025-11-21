@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+   th:replace="~{fragments/dashboard-layout :: dashboardLayout('Gestión de Usuarios', '/css/dashboard-usuarios.css', '/js/dashboard-usuarios.js', ~{::main-content})}">
+
+<body>
+   <!-- Contenido principal que se inyectará en el slot -->
+   <main th:fragment="main-content">
+
+      <!-- HEADER DE LA PÁGINA -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+         <h2><i class="icon ion-md-people me-2"></i>Gestión de Usuarios</h2>
+         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <i class="icon ion-md-add me-2"></i>Agregar Usuario
+         </button>
+      </div>
+
+      <!-- FILTROS Y BÚSQUEDA -->
+      <div class="card mb-4">
+         <div class="card-body">
+            <div class="row">
+               <div class="col-md-6">
+                  <div class="input-group">
+                     <input type="text" class="form-control" placeholder="Buscar usuarios..." id="searchUsers">
+                     <button class="btn btn-outline-secondary" type="button">
+                        <i class="icon ion-md-search"></i>
+                     </button>
+                  </div>
+               </div>
+               <div class="col-md-3">
+                  <select class="form-select" id="filterRole">
+                     <option value="">Todos los roles</option>
+                     <option value="ADMIN">Administrador</option>
+                     <option value="USER">Usuario</option>
+                  </select>
+               </div>
+               <div class="col-md-3">
+                  <select class="form-select" id="filterStatus">
+                     <option value="">Todos los estados</option>
+                     <option value="active">Activos</option>
+                     <option value="inactive">Inactivos</option>
+                  </select>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- TABLA DE USUARIOS -->
+      <div class="card">
+         <div class="card-body">
+            <div class="table-responsive">
+               <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                     <tr>
+                        <th>ID</th>
+                        <th>Avatar</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Fecha Registro</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <!-- Row de ejemplo mientras no tengamos datos reales -->
+                     <tr>
+                        <td>1</td>
+                        <td>
+                           <img src="https://via.placeholder.com/35" class="rounded-circle" alt="Avatar" width="35"
+                              height="35">
+                        </td>
+                        <td>Juan Pérez</td>
+                        <td>juan@mail.com</td>
+                        <td><span class="badge bg-danger">ADMIN</span></td>
+                        <td>01/10/2025</td>
+                        <td><span class="badge bg-success">Activo</span></td>
+                        <td>
+                           <button class="btn btn-sm btn-outline-primary me-1" title="Ver detalles">
+                              <i class="icon ion-md-eye"></i>
+                           </button>
+                           <button class="btn btn-sm btn-outline-warning me-1" title="Editar">
+                              <i class="icon ion-md-create"></i>
+                           </button>
+                           <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                              <i class="icon ion-md-trash"></i>
+                           </button>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>2</td>
+                        <td>
+                           <img src="https://via.placeholder.com/35" class="rounded-circle" alt="Avatar" width="35"
+                              height="35">
+                        </td>
+                        <td>Ana López</td>
+                        <td>ana@mail.com</td>
+                        <td><span class="badge bg-primary">USER</span></td>
+                        <td>28/09/2025</td>
+                        <td><span class="badge bg-success">Activo</span></td>
+                        <td>
+                           <button class="btn btn-sm btn-outline-primary me-1" title="Ver detalles">
+                              <i class="icon ion-md-eye"></i>
+                           </button>
+                           <button class="btn btn-sm btn-outline-warning me-1" title="Editar">
+                              <i class="icon ion-md-create"></i>
+                           </button>
+                           <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                              <i class="icon ion-md-trash"></i>
+                           </button>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>3</td>
+                        <td>
+                           <img src="https://via.placeholder.com/35" class="rounded-circle" alt="Avatar" width="35"
+                              height="35">
+                        </td>
+                        <td>Carlos Torres</td>
+                        <td>carlos@mail.com</td>
+                        <td><span class="badge bg-primary">USER</span></td>
+                        <td>25/09/2025</td>
+                        <td><span class="badge bg-warning text-dark">Inactivo</span></td>
+                        <td>
+                           <button class="btn btn-sm btn-outline-primary me-1" title="Ver detalles">
+                              <i class="icon ion-md-eye"></i>
+                           </button>
+                           <button class="btn btn-sm btn-outline-warning me-1" title="Editar">
+                              <i class="icon ion-md-create"></i>
+                           </button>
+                           <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                              <i class="icon ion-md-trash"></i>
+                           </button>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+
+            <!-- PAGINACIÓN -->
+            <nav aria-label="Paginación de usuarios" class="mt-4">
+               <ul class="pagination justify-content-center">
+                  <li class="page-item disabled">
+                     <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                     <a class="page-link" href="#">Siguiente</a>
+                  </li>
+               </ul>
+            </nav>
+         </div>
+      </div>
+
+      <!-- Modal para agregar usuario -->
+      <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title" id="addUserModalLabel">Agregar Nuevo Usuario</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  <form id="addUserForm">
+                     <div class="mb-3">
+                        <label for="userName" class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="userName" required>
+                     </div>
+                     <div class="mb-3">
+                        <label for="userEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="userEmail" required>
+                     </div>
+                     <div class="mb-3">
+                        <label for="userPassword" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="userPassword" required>
+                     </div>
+                     <div class="mb-3">
+                        <label for="userRole" class="form-label">Rol</label>
+                        <select class="form-select" id="userRole" required>
+                           <option value="">Seleccionar rol</option>
+                           <option value="USER">Usuario</option>
+                           <option value="ADMIN">Administrador</option>
+                        </select>
+                     </div>
+                  </form>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary">Guardar Usuario</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+   </main>
+</body>
+
+</html>

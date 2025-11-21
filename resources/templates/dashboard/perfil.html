@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head('Perfil de Usuario - Dashboard Admin', ${['/css/dashboard.css']}, ${[]})">
+</head>
+
+<body>
+   <div class="d-flex">
+      <!-- SIDEBAR usando fragment -->
+      <div th:replace="fragments/admin-sidebar :: adminSidebar"></div>
+
+      <!-- CONTENIDO PRINCIPAL -->
+      <div class="w-100" id="main-content">
+         <!-- NAVBAR usando fragment -->
+         <div th:replace="fragments/admin-navbar :: adminNavbar"></div>
+
+         <!-- ÁREA DE CONTENIDO -->
+         <div class="container-fluid main-content-area">
+            <!-- HEADER DE LA PÁGINA -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+               <h2><i class="icon ion-md-person me-2"></i>Perfil de Usuario</h2>
+               <button class="btn btn-primary" id="editProfileBtn">
+                  <i class="icon ion-md-create me-2"></i>Editar Perfil
+               </button>
+            </div>
+
+            <div class="row">
+               <!-- INFORMACIÓN DEL PERFIL -->
+               <div class="col-md-4">
+                  <div class="card">
+                     <div class="card-body text-center">
+                        <div class="mb-3">
+                           <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Avatar"
+                              width="150" height="150" id="profileAvatar">
+                           <div>
+                              <button class="btn btn-outline-primary btn-sm" id="changeAvatarBtn">
+                                 <i class="icon ion-md-camera me-1"></i>Cambiar Foto
+                              </button>
+                           </div>
+                        </div>
+                        <h4 th:text="${username}">Daniel de la Cruz</h4>
+                        <p class="text-muted" th:text="${userRole}">Administrador</p>
+                        <span class="badge bg-success">En línea</span>
+                     </div>
+                  </div>
+
+                  <!-- ESTADÍSTICAS DEL USUARIO -->
+                  <div class="card mt-4">
+                     <div class="card-header">
+                        <h5 class="mb-0">Estadísticas</h5>
+                     </div>
+                     <div class="card-body">
+                        <div class="row text-center">
+                           <div class="col-6">
+                              <h4 class="text-primary">45</h4>
+                              <small class="text-muted">Días activo</small>
+                           </div>
+                           <div class="col-6">
+                              <h4 class="text-success">127</h4>
+                              <small class="text-muted">Acciones realizadas</small>
+                           </div>
+                        </div>
+                        <hr>
+                        <div class="row text-center">
+                           <div class="col-6">
+                              <h4 class="text-warning">23</h4>
+                              <small class="text-muted">Productos creados</small>
+                           </div>
+                           <div class="col-6">
+                              <h4 class="text-info">12</h4>
+                              <small class="text-muted">Usuarios gestionados</small>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <!-- ACTIVIDAD RECIENTE -->
+                  <div class="card mt-4">
+                     <div class="card-header">
+                        <h5 class="mb-0">Actividad Reciente</h5>
+                     </div>
+                     <div class="card-body">
+                        <div class="list-group list-group-flush">
+                           <div class="list-group-item border-0 px-0">
+                              <div class="d-flex align-items-center">
+                                 <i class="icon ion-md-add-circle text-success me-2"></i>
+                                 <div>
+                                    <small class="d-block">Producto agregado</small>
+                                    <small class="text-muted">Hace 2 horas</small>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="list-group-item border-0 px-0">
+                              <div class="d-flex align-items-center">
+                                 <i class="icon ion-md-create text-warning me-2"></i>
+                                 <div>
+                                    <small class="d-block">Usuario modificado</small>
+                                    <small class="text-muted">Hace 1 día</small>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="list-group-item border-0 px-0">
+                              <div class="d-flex align-items-center">
+                                 <i class="icon ion-md-trash text-danger me-2"></i>
+                                 <div>
+                                    <small class="d-block">Categoría eliminada</small>
+                                    <small class="text-muted">Hace 3 días</small>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- FORMULARIO DE PERFIL -->
+               <div class="col-md-8">
+                  <div class="card">
+                     <div class="card-header">
+                        <h5 class="mb-0">Información Personal</h5>
+                     </div>
+                     <div class="card-body">
+                        <form id="profileForm">
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="firstName" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="firstName" value="Daniel" readonly>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="lastName" class="form-label">Apellidos</label>
+                                    <input type="text" class="form-control" id="lastName" value="de la Cruz" readonly>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" value="daniel@correo.com"
+                                       readonly>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="phone" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="phone" value="+51 999 123 456" readonly>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="birthDate" value="1990-05-15" readonly>
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="gender" class="form-label">Género</label>
+                                    <select class="form-select" id="gender" disabled>
+                                       <option value="M" selected>Masculino</option>
+                                       <option value="F">Femenino</option>
+                                       <option value="O">Otro</option>
+                                    </select>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="mb-3">
+                              <label for="address" class="form-label">Dirección</label>
+                              <textarea class="form-control" id="address" rows="2"
+                                 readonly>Av. Principal 123, Lima, Perú</textarea>
+                           </div>
+                           <div class="mb-3">
+                              <label for="bio" class="form-label">Biografía</label>
+                              <textarea class="form-control" id="bio" rows="3"
+                                 readonly>Administrador del sistema con más de 5 años de experiencia en gestión de plataformas de comercio electrónico.</textarea>
+                           </div>
+                           <div class="d-none" id="profileActions">
+                              <hr>
+                              <div class="d-flex gap-2">
+                                 <button type="button" class="btn btn-success" id="saveProfileBtn">
+                                    <i class="icon ion-md-checkmark me-2"></i>Guardar Cambios
+                                 </button>
+                                 <button type="button" class="btn btn-secondary" id="cancelEditBtn">
+                                    <i class="icon ion-md-close me-2"></i>Cancelar
+                                 </button>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+
+                  <!-- CONFIGURACIÓN DE SEGURIDAD -->
+                  <div class="card mt-4">
+                     <div class="card-header">
+                        <h5 class="mb-0">Configuración de Seguridad</h5>
+                     </div>
+                     <div class="card-body">
+                        <form id="securityForm">
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                                    <input type="password" class="form-control" id="currentPassword">
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                                    <input type="password" class="form-control" id="newPassword">
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="row">
+                              <div class="col-md-6">
+                                 <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                                    <input type="password" class="form-control" id="confirmPassword">
+                                 </div>
+                              </div>
+                              <div class="col-md-6 d-flex align-items-end">
+                                 <button type="button" class="btn btn-warning">
+                                    <i class="icon ion-md-lock me-2"></i>Cambiar Contraseña
+                                 </button>
+                              </div>
+                           </div>
+                        </form>
+
+                        <hr>
+
+                        <!-- CONFIGURACIONES ADICIONALES -->
+                        <h6>Configuraciones de Cuenta</h6>
+                        <div class="form-check mb-2">
+                           <input class="form-check-input" type="checkbox" id="enableNotifications" checked>
+                           <label class="form-check-label" for="enableNotifications">
+                              Recibir notificaciones por email
+                           </label>
+                        </div>
+                        <div class="form-check mb-2">
+                           <input class="form-check-input" type="checkbox" id="enableTwoFactor">
+                           <label class="form-check-label" for="enableTwoFactor">
+                              Habilitar autenticación de dos factores
+                           </label>
+                        </div>
+                        <div class="form-check mb-3">
+                           <input class="form-check-input" type="checkbox" id="enableLoginAlerts" checked>
+                           <label class="form-check-label" for="enableLoginAlerts">
+                              Alertas de inicio de sesión
+                           </label>
+                        </div>
+
+                        <button type="button" class="btn btn-outline-primary">
+                           <i class="icon ion-md-save me-2"></i>Guardar Configuración
+                        </button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Modal para cambiar avatar -->
+   <div class="modal fade" id="changeAvatarModal" tabindex="-1" aria-labelledby="changeAvatarModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="changeAvatarModalLabel">Cambiar Foto de Perfil</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <div class="text-center mb-3">
+                  <img src="https://via.placeholder.com/150" class="rounded-circle" alt="Preview" width="150"
+                     height="150" id="avatarPreview">
+               </div>
+               <div class="mb-3">
+                  <label for="avatarFile" class="form-label">Seleccionar nueva imagen</label>
+                  <input type="file" class="form-control" id="avatarFile" accept="image/*">
+                  <div class="form-text">Tamaño recomendado: 400x400 píxeles. Máximo 2MB.</div>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+               <button type="button" class="btn btn-primary">Guardar Foto</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Modales de autenticación -->
+   <div th:replace="fragments/login-modal :: loginModal"></div>
+   <div th:replace="fragments/register-modal :: registerModal"></div>
+
+   <!-- Ionicons para los iconos -->
+   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+   <!-- Scripts comunes (Bootstrap, jQuery, etc.) -->
+   <div th:replace="fragments/scripts :: scripts(${['/js/dashboard.js']})"></div>
+
+   <!-- Script específico para perfil -->
+   <script>
+      document.addEventListener('DOMContentLoaded', function () {
+         // Funcionalidad para editar perfil
+         const editProfileBtn = document.getElementById('editProfileBtn');
+         const saveProfileBtn = document.getElementById('saveProfileBtn');
+         const cancelEditBtn = document.getElementById('cancelEditBtn');
+         const profileActions = document.getElementById('profileActions');
+         const formFields = ['firstName', 'lastName', 'email', 'phone', 'birthDate', 'gender', 'address', 'bio'];
+
+         editProfileBtn.addEventListener('click', function () {
+            // Habilitar campos del formulario
+            formFields.forEach(field => {
+               const element = document.getElementById(field);
+               if (element.tagName === 'SELECT') {
+                  element.disabled = false;
+               } else {
+                  element.readOnly = false;
+               }
+               element.classList.add('border-primary');
+            });
+
+            // Mostrar botones de acción
+            profileActions.classList.remove('d-none');
+            editProfileBtn.style.display = 'none';
+         });
+
+         cancelEditBtn.addEventListener('click', function () {
+            // Deshabilitar campos del formulario
+            formFields.forEach(field => {
+               const element = document.getElementById(field);
+               if (element.tagName === 'SELECT') {
+                  element.disabled = true;
+               } else {
+                  element.readOnly = true;
+               }
+               element.classList.remove('border-primary');
+            });
+
+            // Ocultar botones de acción
+            profileActions.classList.add('d-none');
+            editProfileBtn.style.display = 'inline-block';
+         });
+
+         // Funcionalidad para cambiar avatar
+         const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+         changeAvatarBtn.addEventListener('click', function () {
+            const modal = new bootstrap.Modal(document.getElementById('changeAvatarModal'));
+            modal.show();
+         });
+
+         // Preview de imagen de avatar
+         const avatarFile = document.getElementById('avatarFile');
+         const avatarPreview = document.getElementById('avatarPreview');
+
+         avatarFile.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+               const reader = new FileReader();
+               reader.onload = function (e) {
+                  avatarPreview.src = e.target.result;
+               };
+               reader.readAsDataURL(file);
+            }
+         });
+      });
+   </script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Usuarios</title>
+</head>
+<body>
+    <h1>Lista de Usuarios</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.role}"></td>
+                <td th:text="${user.enabled ? 'Activo' : 'Inactivo'}"></td>
+                <td>
+                    <a th:href="@{'/web/users/' + ${user.id}}">Ver Detalle</a>
+                    |
+                    <form th:action="@{'/web/users/' + ${user.id} + '/toggle-status'}" method="post" style="display:inline">
+                        <button type="submit" th:text="${user.enabled ? 'Desactivar' : 'Activar'}"></button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+

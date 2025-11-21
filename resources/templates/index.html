@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Inicio', '/css/index.css', '/js/index.js')}"></head>
+
+<body>
+	<!-- Navbar -->
+	<div
+		th:replace="~{fragments/navbar :: navbar('home', ${categories}, ${cartCount}, ${isAuthenticated}, ${username})}">
+	</div>
+
+	<!-- Hero Section -->
+	<section class="hero-section">
+		<div class="container">
+			<div class="hero">
+				<h2>Bienvenido a ModaTec</h2>
+				<p>
+					Tu tienda tecnológica de confianza en Perú. Encuentra laptops, smartphones, accesorios y mucho más al
+					mejor
+					precio.
+				</p>
+				<a th:href="@{/web/products}" class="btn btn-primary">
+					Ver Productos
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- Categorías -->
+	<section class="section-padding bg-gradient-light" id="categories">
+		<div class="container">
+			<div class="text-center mb-5">
+				<h2 class="section-title">Nuestras Categorías</h2>
+				<p class="lead text-muted">Explora nuestra amplia gama de productos tecnológicos</p>
+			</div>
+
+			<div class="row g-4">
+				<div class="col-md-4 mb-4 fade-in" th:each="category : ${categories}">
+					<div class="card category-card h-100">
+						<div class="card-body text-center">
+							<i class="bi bi-laptop category-icon display-1 mb-4"></i>
+							<h5 class="card-title fw-bold mb-3" th:text="${category.name}">
+								Categoría
+							</h5>
+							<p class="card-text text-muted mb-4" th:text="${category.description}">
+								Descripción de la categoría
+							</p>
+							<a th:href="@{/web/products(search=${''}, categoryId=${category.id})}"
+								class="btn btn-outline-primary">
+								<i class="bi bi-arrow-right me-2"></i>Ver Productos
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Productos Destacados -->
+	<section class="section-padding" th:if="${not #lists.isEmpty(featuredProducts)}">
+		<div class="container">
+			<div class="text-center mb-5">
+				<h2 class="section-title">Productos Destacados</h2>
+				<p class="lead text-muted">Los productos más populares y mejor valorados</p>
+			</div>
+
+			<div class="row g-4">
+				<div class="col-lg-3 col-md-6 mb-4 fade-in" th:each="product : ${featuredProducts}">
+					<div class="card product-card h-100">
+						<div class="position-relative overflow-hidden">
+							<img
+								th:src="${product.detailProduct.imageUrl != null ? product.detailProduct.imageUrl : 'https://via.placeholder.com/300x250/e9ecef/6c757d?text=Producto'}"
+								class="card-img-top" th:alt="${product.name}" />
+							<div class="position-absolute top-0 end-0 m-3">
+								<span class="badge bg-danger" th:if="${product.stock == 0}">Agotado</span>
+								<span class="badge bg-success" th:if="${product.stock > 0}">Disponible</span>
+							</div>
+						</div>
+
+						<div class="card-body d-flex flex-column">
+							<h6 class="card-title fw-bold mb-2" th:text="${product.name}">
+								Producto
+							</h6>
+							<p class="card-text text-muted small mb-3" th:text="${product.detailProduct.description}">
+								Descripción del producto
+							</p>
+
+							<div class="mt-auto">
+								<div class="d-flex justify-content-between align-items-center mb-3">
+									<span class="price-badge" th:text="'$' + ${product.detailProduct.price}">$999</span>
+									<small class="text-muted" th:if="${product.stock > 0}">
+										<i class="bi bi-check-circle-fill text-success me-1"></i>
+										<span th:text="${product.stock} + ' disponibles'">En stock</span>
+									</small>
+								</div>
+
+								<div class="d-grid gap-2">
+									<a th:href="@{/web/products/{id}(id=${product.id})}" class="btn btn-primary btn-sm">
+										<i class="bi bi-eye me-2"></i>Ver Detalles
+									</a>
+									<button class="btn btn-outline-success btn-sm btn-add-to-cart" th:if="${product.stock > 0}"
+										th:data-product-id="${product.id}">
+										<i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="text-center mt-3">
+				<a href="/products" class="btn btn-outline-primary btn-lg">
+					<i class="bi bi-grid me-2"></i>Ver Todos los Productos
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- Features Section -->
+	<section class="bg-gradient-light mt-12 mb-12 pb-6">
+		<div class="container">
+			<div class="row g-4">
+				<div class="col-md-3 text-center fade-in">
+					<div class="mb-3">
+						<i class="bi bi-truck display-4 text-primary"></i>
+					</div>
+					<h5 class="fw-bold">Envío Gratis</h5>
+					<p class="text-muted mb-0">En compras mayores a $100</p>
+				</div>
+				<div class="col-md-3 text-center fade-in">
+					<div class="mb-3">
+						<i class="bi bi-shield-check display-4 text-success"></i>
+					</div>
+					<h5 class="fw-bold">Garantía Total</h5>
+					<p class="text-muted mb-0">12 meses de garantía completa</p>
+				</div>
+				<div class="col-md-3 text-center fade-in">
+					<div class="mb-3">
+						<i class="bi bi-headset display-4 text-info"></i>
+					</div>
+					<h5 class="fw-bold">Soporte 24/7</h5>
+					<p class="text-muted mb-0">Atención personalizada siempre</p>
+				</div>
+				<div class="col-md-3 text-center fade-in">
+					<div class="mb-3">
+						<i class="bi bi-arrow-repeat display-4 text-warning"></i>
+					</div>
+					<h5 class="fw-bold">Devoluciones</h5>
+					<p class="text-muted mb-0">30 días para devolver tu compra</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="footer section-padding mt-6">
+		<div class="container footer-content">
+			<div class="row g-4">
+				<div class="col-lg-4">
+					<h5 class="fw-bold mb-4"><i class="bi bi-cpu-fill text-warning me-2"></i>MODATEC</h5>
+					<p class="text-light mb-4">
+						Somos líderes en tecnología, ofreciendo los mejores productos electrónicos con calidad garantizada y
+						servicio
+						excepcional.
+					</p>
+					<div class="social-links">
+						<a href="#" class="text-decoration-none">
+							<i class="bi bi-facebook"></i>
+						</a>
+						<a href="#" class="text-decoration-none">
+							<i class="bi bi-instagram"></i>
+						</a>
+						<a href="#" class="text-decoration-none">
+							<i class="bi bi-twitter"></i>
+						</a>
+						<a href="#" class="text-decoration-none">
+							<i class="bi bi-linkedin"></i>
+						</a>
+						<a href="#" class="text-decoration-none">
+							<i class="bi bi-youtube"></i>
+						</a>
+					</div>
+				</div>
+
+				<div class="col-lg-2 col-md-6">
+					<h6 class="fw-bold mb-3">Navegación</h6>
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<a href="/" class="text-decoration-none">
+								<i class="bi bi-house me-2"></i>Inicio
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/products" class="text-decoration-none">
+								<i class="bi bi-grid me-2"></i>Productos
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/web/cart" class="text-decoration-none">
+								<i class="bi bi-bag me-2"></i>Carrito
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/orders" class="text-decoration-none">
+								<i class="bi bi-box me-2"></i>Mis Pedidos
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-lg-3 col-md-6">
+					<h6 class="fw-bold mb-3">Soporte</h6>
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<a href="#" class="text-decoration-none">
+								<i class="bi bi-question-circle me-2"></i>Preguntas Frecuentes
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="#" class="text-decoration-none">
+								<i class="bi bi-telephone me-2"></i>Contacto
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="#" class="text-decoration-none">
+								<i class="bi bi-shield me-2"></i>Garantía
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="#" class="text-decoration-none">
+								<i class="bi bi-arrow-repeat me-2"></i>Devoluciones
+							</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-lg-3">
+					<h6 class="fw-bold mb-3">Newsletter</h6>
+					<p class="text-light mb-3">Recibe ofertas exclusivas y novedades</p>
+					<form class="row g-2">
+						<div class="col-12">
+							<div class="input-group">
+								<input type="email" class="form-control" placeholder="tu@email.com"
+									style="border-radius: 25px 0 0 25px" />
+								<button class="btn btn-warning" type="submit" style="border-radius: 0 25px 25px 0">
+									<i class="bi bi-send"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+
+					<div class="mt-4">
+						<h6 class="fw-bold mb-2">Medios de Pago</h6>
+						<div class="d-flex gap-2">
+							<i class="bi bi-credit-card-2-front fs-3 text-info"></i>
+							<i class="bi bi-paypal fs-3 text-primary"></i>
+							<i class="bi bi-bank fs-3 text-success"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<hr class="my-4 border-light opacity-25" />
+
+			<div class="row align-items-center">
+				<div class="col-md-6">
+					<p class="mb-0 text-light">&copy; 2025 MODATEC. Todos los derechos reservados.</p>
+				</div>
+				<div class="col-md-6 text-md-end">
+					<small class="text-light">
+						<a href="#" class="text-decoration-none me-3">Términos y Condiciones</a>
+						<a href="#" class="text-decoration-none">Política de Privacidad</a>
+					</small>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Modal de confirmación de añadido al carrito -->
+	<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header bg-success text-white">
+					<h5 class="modal-title" id="addToCartModalLabel">
+						<i class="fas fa-check-circle"></i> ¡Producto agregado!
+					</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body text-center">
+					<i class="fas fa-shopping-cart fa-3x text-success mb-3"></i>
+					<h5 id="productAddedName">Producto</h5>
+					<p class="text-muted">Se ha añadido al carrito de compras exitosamente</p>
+				</div>
+				<div class="modal-footer justify-content-between">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+						<i class="fas fa-arrow-left"></i> Seguir comprando
+					</button>
+					<a href="/web/cart" class="btn btn-primary">
+						<i class="fas fa-shopping-cart"></i> Ver carrito
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modales -->
+	<div th:replace="~{fragments/login-modal :: loginModal}"></div>
+	<div th:replace="~{fragments/register-modal :: registerModal}"></div>
+	<div th:replace="~{fragments/scripts :: scripts('/js/index.js')}"></div>
+</body>
+
+</html>

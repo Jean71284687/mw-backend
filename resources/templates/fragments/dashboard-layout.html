@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="dashboardLayout(pageTitle, extraCss, extraJs, mainContent)">
+
+<head th:replace="~{fragments/head :: head(${pageTitle}, ${extraCss}, ${extraJs})}">
+</head>
+
+<body>
+   <!-- Navbar Fragment -->
+   <div th:replace="~{fragments/admin-navbar :: adminNavbar}"></div>
+
+   <div class="container-fluid">
+      <div class="row">
+         <!-- Sidebar Fragment -->
+         <div th:replace="~{fragments/admin-sidebar-new :: adminSidebarNew}"></div>
+
+         <!-- Main Content (SLOT) -->
+         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <th:block th:replace="${mainContent}" />
+         </main>
+      </div>
+   </div>
+   <!-- Bootstrap JavaScript - SOLO para el dashboard -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+           integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+           crossorigin="anonymous"></script>
+
+   <!-- Cargar JavaScript específico de la página DESPUÉS de Bootstrap -->
+   <th:block th:if="${extraJs != null and !#strings.isEmpty(extraJs)}">
+       <script th:src="@{${extraJs}}"></script>
+   </th:block>
+</body>
+
+</html>

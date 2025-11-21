@@ -1,0 +1,126 @@
+/* Carrito de Compras - Estilos */
+
+/* Animación de entrada */
+.fade-in {
+	animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Cards con efecto hover */
+.shadow-hover {
+	transition: all 0.3s ease;
+	border: none;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-hover:hover {
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	transform: translateY(-2px);
+}
+
+/* Imagen del producto en el carrito */
+.shadow-hover img {
+	transition: transform 0.3s ease;
+}
+
+.shadow-hover:hover img {
+	transform: scale(1.05);
+}
+
+/* Badges de condición */
+.badge {
+	font-size: 0.75rem;
+	padding: 0.35em 0.65em;
+}
+
+/* Input de cantidad */
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Botones personalizados */
+.btn {
+	transition: all 0.3s ease;
+}
+
+.btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline-danger:hover {
+	background-color: #dc3545;
+	border-color: #dc3545;
+	color: white;
+}
+
+/* Resumen del pedido sticky */
+.sticky-top {
+	z-index: 100;
+}
+
+/* Alertas personalizadas */
+.alert {
+	border-radius: 8px;
+	border: none;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.sticky-top {
+		position: relative !important;
+		top: 0 !important;
+	}
+
+	.col-md-2,
+	.col-md-4 {
+		text-align: center;
+		margin-bottom: 1rem;
+	}
+}
+
+/* Carrito vacío */
+.text-center i.display-1 {
+	color: #dee2e6;
+}
+
+/* Línea divisoria en el resumen */
+hr {
+	border-top: 2px solid #dee2e6;
+	margin: 1rem 0;
+}
+
+/* Total destacado */
+.text-success {
+	font-weight: 700;
+	color: #28a745 !important;
+}
+
+/* Header del card */
+.card-header.bg-primary {
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+}
+
+/* Footer del card */
+.card-footer.bg-light {
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}

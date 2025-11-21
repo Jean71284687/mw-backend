@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/dashboard-layout :: dashboardLayout('Gestión de Productos', '/css/dashboard-productos.css', '/js/dashboard-productos.js', ~{::main-content})}">
+
+<body>
+<div th:fragment="main-content">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <h2><i class="icon ion-md-podium me-2"></i>Gestión de Productos</h2>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="exportarProductos()">
+                <i class="icon ion-md-download me-1"></i>Exportar
+            </button>
+            <button class="btn btn-primary" onclick="abrirModalCRUD()">
+                <i class="icon ion-md-add me-1"></i>Agregar Producto
+            </button>
+        </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Total Productos</h6>
+                            <h3 class="mb-0" th:text="${stats.total}">0</h3>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="icon ion-md-cube"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">En Stock</h6>
+                            <h3 class="mb-0" th:text="${stats.enStock}">0</h3>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="icon ion-md-checkmark-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Stock Bajo</h6>
+                            <h3 class="mb-0" th:text="${stats.stockBajo}">0</h3>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="icon ion-md-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stats-card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Agotados</h6>
+                            <h3 class="mb-0" th:text="${stats.agotados}">0</h3>
+                        </div>
+                        <div class="stats-icon">
+                            <i class="icon ion-md-close-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" th:action="@{/admin/dashboard/productos}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="icon ion-md-search"></i></span>
+                            <input type="text" class="form-control" name="search" th:value="${currentSearch}"
+                                   placeholder="Buscar por nombre o descripción...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="categoria">
+                            <option value="">Todas las categorías</option>
+                            <option th:each="cat : ${categorias}"
+                                    th:value="${cat.name}"
+                                    th:text="${cat.name}"
+                                    th:selected="${currentCategoria == cat.name}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="estado">
+                            <option value="">Todos los estados</option>
+                            <option value="ACTIVE" th:selected="${currentEstado == 'ACTIVE'}">Activos</option>
+                            <option value="INACTIVE" th:selected="${currentEstado == 'INACTIVE'}">Inactivos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="condicion">
+                            <option value="">Todas las condiciones</option>
+                            <option value="NEW" th:selected="${currentCondicion == 'NEW'}">Nuevo</option>
+                            <option value="USED" th:selected="${currentCondicion == 'USED'}">Usado</option>
+                            <option value="REFURBISHED" th:selected="${currentCondicion == 'REFURBISHED'}">Reacondicionado</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon ion-md-funnel me-1"></i>Aplicar Filtros
+                        </button>
+                        <a th:href="@{/admin/dashboard/productos}" class="btn btn-outline-secondary">
+                            <i class="icon ion-md-refresh me-1"></i>Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TABLA DE PRODUCTOS -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Lista de Productos</h5>
+            <span class="badge bg-secondary" th:text="${totalProductos} + ' productos'">0 productos</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">ID</th>
+                        <th>Imagen</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Condición</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${productosPage.content.empty}">
+                        <td colspan="9" class="text-center py-5">
+                            <i class="icon ion-md-information-circle" style="font-size: 3rem; opacity: 0.3;"></i>
+                            <p class="mb-0 mt-2 text-muted">No se encontraron productos</p>
+                        </td>
+                    </tr>
+
+                    <tr th:each="producto : ${productosPage.content}" th:unless="${productosPage.content.empty}">
+                        <td class="ps-3">
+                            <strong class="text-primary" th:text="${producto.id}">101</strong>
+                        </td>
+                        <td>
+                            <img th:src="${producto.primaryImageUrl}"
+                                 alt="Producto" class="rounded" width="40" height="40">
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <strong th:text="${producto.name}">Nombre del producto</strong>
+                                <small class="text-muted"
+                                       th:text="${producto.detailProduct != null && producto.detailProduct.description != null} ?
+                                             ${#strings.abbreviate(producto.detailProduct.description, 50)} : 'Sin descripción'">
+                                    Descripción breve
+                                </small>
+                            </div>
+                        </td>
+                        <td th:text="${producto.category != null} ? ${producto.category.name} : 'Sin categoría'">Categoría</td>
+                        <td>
+                            <strong th:text="'S/ ' + ${#numbers.formatDecimal((producto.detailProduct != null ? producto.detailProduct.price : 0), 1, 2)}">S/ 0.00</strong>
+                        </td>
+                        <td>
+                           <span th:classappend="${producto.stock > 10} ? 'badge bg-success' :
+                                                (${producto.stock > 0} ? 'badge bg-warning' : 'badge bg-danger')"
+                                 th:text="${producto.stock}">25</span>
+                        </td>
+                        <td>
+                           <span th:classappend="${producto.productCondition.name() == 'NEW'} ? 'badge bg-info' :
+                                                (${producto.productCondition.name() == 'USED'} ? 'badge bg-secondary' : 'badge bg-warning')"
+                                 th:text="${producto.productCondition}">NUEVO</span>
+                        </td>
+                        <td>
+                            <span th:if="${producto.productStatus.name() == 'ACTIVE'}" class="badge bg-success">ACTIVO</span>
+                            <span th:unless="${producto.productStatus.name() == 'ACTIVE'}" class="badge bg-danger">INACTIVO</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <!-- DETALLES -->
+                                <button class="btn btn-outline-primary"
+                                        title="Ver detalles"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#productoDetailModal"
+                                        th:onclick="'viewProductDetails(' + ${producto.id} + ')'">
+                                    <i class="icon ion-md-eye"></i>
+                                </button>
+
+                                <!-- EDITAR -->
+                                <button class="btn btn-outline-warning"
+                                        title="Editar producto"
+                                        th:onclick="'abrirEdicionProducto(' + ${producto.id} + ')'">
+                                    <i class="icon ion-md-create"></i>
+                                </button>
+
+                                <!-- CAMBIAR ESTADO -->
+                                <button class="btn btn-outline-info"
+                                        title="Cambiar estado"
+                                        th:onclick="'cambiarEstadoProducto(' + ${producto.id} + ', ' + (${producto.productStatus.name() != 'ACTIVE'}) + ')'">
+                                    <i class="icon ion-md-power"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <!-- Paginación -->
+            <nav aria-label="Paginación de productos" th:if="${productosPage.totalPages > 0}">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="${currentPage > 0} ? @{/admin/dashboard/productos(page=${currentPage - 1}, search=${currentSearch}, categoria=${currentCategoria}, estado=${currentEstado}, condicion=${currentCondicion})} : '#'"
+                           tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:if="${pageNum == 0 || pageNum == totalPages - 1 || (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)}"
+                        th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/admin/dashboard/productos(page=${pageNum}, search=${currentSearch}, categoria=${currentCategoria}, estado=${currentEstado}, condicion=${currentCondicion})}"
+                           th:text="${pageNum + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="${currentPage < totalPages - 1} ? @{/admin/dashboard/productos(page=${currentPage + 1}, search=${currentSearch}, categoria=${currentCategoria}, estado=${currentEstado}, condicion=${currentCondicion})} : '#'">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLES PRODUCTO -->
+    <div class="modal fade" id="productoDetailModal" tabindex="-1" aria-labelledby="productoDetailModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productoDetailModalLabel">
+                        <i class="icon ion-md-cube me-2"></i>Detalles de Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img id="detailImagen" src="" alt="Producto" class="img-fluid rounded mb-3" style="max-height: 200px;">
+                        </div>
+                        <div class="col-md-8">
+                            <h4 id="detailNombre" class="mb-2">Nombre del Producto</h4>
+                            <p id="detailDescripcion" class="text-muted mb-3">Descripción del producto...</p>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Categoría:</strong>
+                                    <span id="detailCategoria" class="badge bg-info ms-2">Categoría</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Condición:</strong>
+                                    <span id="detailCondicion" class="badge bg-warning ms-2">Nuevo</span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Precio:</strong>
+                                    <span id="detailPrecio" class="fw-bold text-primary">S/ 0.00</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Stock:</strong>
+                                    <span id="detailStock" class="badge bg-success">0</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>Estado:</strong>
+                                <span id="detailEstado" class="badge bg-success ms-2">ACTIVO</span>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Marca:</strong>
+                                    <span id="detailMarca">-</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Modelo:</strong>
+                                    <span id="detailModelo">-</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>Código:</strong>
+                                <span id="detailCodigo" class="text-muted">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDICIÓN SIMPLE -->
+    <div class="modal fade" id="productoEdicionModal" tabindex="-1" aria-labelledby="productoEdicionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="productoEdicionModalLabel">
+                        <i class="icon ion-md-create me-2"></i>Editar Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarProducto">
+                        <input type="hidden" id="editProductoId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Categoría *</label>
+                                <select class="form-select" id="editCategoria" name="categoriaId" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Precio (S/) *</label>
+                                <input type="number" class="form-control" id="editPrecio" name="precio" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Stock *</label>
+                                <input type="number" class="form-control" id="editStock" name="stock" min="0" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Condición *</label>
+                                <select class="form-select" id="editCondicion" name="condicion" required>
+                                    <option value="NEW">Nuevo</option>
+                                    <option value="USED">Usado</option>
+                                    <option value="REFURBISHED">Reacondicionado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Marca *</label>
+                                <input type="text" class="form-control" id="editMarca" name="marca" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Modelo *</label>
+                                <input type="text" class="form-control" id="editModelo" name="modelo" required>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" id="editDescripcion" name="descripcion" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">URL de Imagen</label>
+                                <input type="text" class="form-control" id="editImagenUrl" name="imagenUrl">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="actualizarProducto()">
+                        <i class="icon ion-md-checkmark me-1"></i>Actualizar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CRUD COMPLETO -->
+    <div class="modal fade" id="productoCrudModal" tabindex="-1" aria-labelledby="productoCrudModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productoCrudModalLabel">
+                        <i class="icon ion-md-cube me-2"></i>Gestión Completa de Productos
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- PESTAÑAS PARA CRUD COMPLETO -->
+                    <ul class="nav nav-tabs mb-3">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="agregarTab" onclick="mostrarSeccion('agregar')">
+                                <i class="icon ion-md-add me-1"></i>Agregar Producto
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="gestionarTab" onclick="mostrarSeccion('gestionar')">
+                                <i class="icon ion-md-list me-1"></i>Gestionar Productos
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- SECCIÓN AGREGAR -->
+                    <div id="seccionAgregar">
+                        <form id="formAgregarProducto">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" name="nombre" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Categoría *</label>
+                                    <select class="form-select" name="categoriaId" required>
+                                        <option value="">Seleccionar categoría</option>
+                                        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Precio (S/) *</label>
+                                    <input type="number" class="form-control" name="precio" step="0.01" min="0.01" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Stock *</label>
+                                    <input type="number" class="form-control" name="stock" min="0" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Condición *</label>
+                                    <select class="form-select" name="condicion" required>
+                                        <option value="NEW">Nuevo</option>
+                                        <option value="USED">Usado</option>
+                                        <option value="REFURBISHED">Reacondicionado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Marca *</label>
+                                    <input type="text" class="form-control" name="marca" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Modelo *</label>
+                                    <input type="text" class="form-control" name="modelo" required>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Descripción</label>
+                                    <textarea class="form-control" name="descripcion" rows="3"></textarea>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">URL de Imagen</label>
+                                    <input type="text" class="form-control" name="imagenUrl">
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="activo" checked>
+                                        <label class="form-check-label">Producto activo</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- SECCIÓN GESTIONAR -->
+                    <div id="seccionGestionar" style="display: none;">
+                        <div class="table-responsive" style="max-height: 300px;">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Estado</th>
+                                    <th class="text-center">Acciones CRUD</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tablaGestionProductos">
+                                <!-- Los productos se cargan aquí dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                    <!-- Botones para AGREGAR -->
+                    <div id="botonesAgregar">
+                        <button type="button" class="btn btn-success" onclick="guardarNuevoProducto()">
+                            <i class="icon ion-md-save me-1"></i>Guardar Producto
+                        </button>
+                    </div>
+
+                    <!-- Botones para GESTIONAR (ocultos inicialmente) -->
+                    <div id="botonesGestionar" style="display: none;">
+                        <button type="button" class="btn btn-outline-info" onclick="recargarListaGestion()">
+                            <i class="icon ion-md-refresh me-1"></i>Actualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

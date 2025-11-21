@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <div th:replace="~{fragments/head :: head('Prueba de Registro')}"></div>
+</head>
+
+<body>
+   <div
+      th:replace="~{fragments/navbar :: navbar('register', ${categories}, ${cartCount}, ${isAuthenticated}, ${username})}">
+   </div>
+
+   <div class="container mt-5">
+      <div class="row justify-content-center">
+         <div class="col-md-8">
+            <div class="card">
+               <div class="card-header">
+                  <h3><i class="bi bi-person-plus-fill me-2"></i>Prueba de Registro de Usuario</h3>
+               </div>
+               <div class="card-body">
+                  <p class="lead">Haz clic en el botón de abajo para abrir el modal de registro:</p>
+
+                  <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal"
+                     data-bs-target="#registerModal">
+                     <i class="bi bi-person-plus me-2"></i>Abrir Modal de Registro
+                  </button>
+
+                  <hr class="my-4">
+
+                  <h5>Instrucciones:</h5>
+                  <ul class="list-group list-group-flush">
+                     <li class="list-group-item">
+                        <i class="bi bi-1-circle-fill text-primary me-2"></i>
+                        Completa todos los campos del formulario
+                     </li>
+                     <li class="list-group-item">
+                        <i class="bi bi-2-circle-fill text-primary me-2"></i>
+                        Asegúrate de que las contraseñas coincidan
+                     </li>
+                     <li class="list-group-item">
+                        <i class="bi bi-3-circle-fill text-primary me-2"></i>
+                        El celular debe tener exactamente 9 dígitos
+                     </li>
+                     <li class="list-group-item">
+                        <i class="bi bi-4-circle-fill text-primary me-2"></i>
+                        Acepta los términos y condiciones
+                     </li>
+                     <li class="list-group-item">
+                        <i class="bi bi-5-circle-fill text-primary me-2"></i>
+                        Haz clic en "Crear Mi Cuenta"
+                     </li>
+                  </ul>
+
+                  <div class="alert alert-info mt-4" role="alert">
+                     <i class="bi bi-info-circle-fill me-2"></i>
+                     <strong>Datos de prueba:</strong><br>
+                     Email: prueba@modatec.com<br>
+                     Celular: 987654321<br>
+                     Contraseña: MiPassword123
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Incluir los modales -->
+   <div th:replace="~{fragments/register-modal :: registerModal}"></div>
+   <div th:replace="~{fragments/login-modal :: loginModal}"></div>
+
+   <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+
+</html>

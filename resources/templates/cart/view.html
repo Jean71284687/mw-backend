@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Mi Carrito - MODATEC', '/css/cart.css', null)}"></head>
+
+<body>
+	<!-- Navbar -->
+	<div
+		th:replace="~{fragments/navbar :: navbar('cart', ${categories}, ${cartCount}, ${isAuthenticated}, ${username})}">
+	</div>
+
+	<div class="container-fluid mt-4 fade-in">
+		<!-- Mensajes de éxito/error -->
+		<div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div class="row mb-4">
+			<div class="col">
+				<h1 class="h3 fw-bold">
+					<i class="fas fa-shopping-cart"></i> Mi Carrito de Compras
+				</h1>
+				<p class="text-muted">Revisa y gestiona tus productos</p>
+			</div>
+		</div>
+
+		<!-- Carrito vacío -->
+		<div th:if="${#lists.isEmpty(cart.purchaseCartItems)}" class="text-center py-5">
+			<i class="fas fa-shopping-cart display-1 text-muted mb-3"></i>
+			<h3 class="mb-3">Tu carrito está vacío</h3>
+			<p class="text-muted mb-4">Agrega algunos productos increíbles a tu carrito</p>
+			<a th:href="@{/web/products}" class="btn btn-primary">
+				<i class="fas fa-store"></i> Explorar Productos
+			</a>
+		</div>
+
+		<!-- Items del carrito -->
+		<div th:if="${not #lists.isEmpty(cart.purchaseCartItems)}">
+			<div class="row">
+				<div class="col-lg-8">
+					<!-- Lista de productos -->
+					<div class="card shadow-hover mb-3" th:each="item : ${cart.purchaseCartItems}">
+						<div class="card-body">
+							<div class="row align-items-center">
+								<!-- Imagen del producto -->
+								<div class="col-md-2">
+									<img
+										th:src="${item.product.detailProduct?.imageUrl != null ? item.product.detailProduct.imageUrl : '/images/no-image.png'}"
+										class="img-fluid rounded" th:alt="${item.product.name}"
+										style="max-height: 100px; object-fit: cover" />
+								</div>
+
+								<!-- Información del producto -->
+								<div class="col-md-4">
+									<h6 class="fw-bold mb-1" th:text="${item.product.name}"></h6>
+									<small class="text-muted d-block mb-2">
+										<span th:if="${item.product.detailProduct?.brand}"
+											th:text="${item.product.detailProduct.brand}"></span>
+										<span th:if="${item.product.detailProduct?.commercialName}"
+											th:text="' - ' + ${item.product.detailProduct.commercialName}"></span>
+									</small>
+									<span class="badge"
+										th:classappend="${(item.product.productCondition.name() == 'NEW') ? 'bg-success' : (item.product.productCondition.name() == 'LIKE_NEW') ? 'bg-info' : (item.product.productCondition.name() == 'REFURBISHED') ? 'bg-warning' : 'bg-secondary'}"
+										th:text="${(item.product.productCondition.name() == 'NEW') ? 'Nuevo' : (item.product.productCondition.name() == 'LIKE_NEW') ? 'Como nuevo' : (item.product.productCondition.name() == 'REFURBISHED') ? 'Reacondicionado' : 'Usado'}">
+									</span>
+								</div>
+
+								<!-- Precio unitario -->
+								<div class="col-md-2 text-center">
+									<small class="text-muted d-block">Precio unitario</small>
+									<div class="fw-bold text-primary" th:if="${item.product.detailProduct?.price}">
+										<div th:if="${item.product.detailProduct.discount > 0}">
+											<small class="text-decoration-line-through text-muted"
+												th:text="'S/ ' + ${#numbers.formatDecimal(item.product.detailProduct.price, 1, 2)}"></small>
+											<div
+												th:text="'S/ ' + ${#numbers.formatDecimal(item.product.detailProduct.price * (1 - item.product.detailProduct.discount / 100.0), 1, 2)}">
+											</div>
+										</div>
+										<div th:if="${item.product.detailProduct.discount == 0}"
+											th:text="'S/ ' + ${#numbers.formatDecimal(item.product.detailProduct.price, 1, 2)}">
+										</div>
+									</div>
+								</div>
+
+								<!-- Cantidad -->
+								<div class="col-md-2">
+									<form th:action="@{/web/cart/update/{id}(id=${item.id})}" method="post">
+										<label class="form-label small mb-1">Cantidad</label>
+										<div class="input-group input-group-sm">
+											<input type="number" class="form-control" name="quantity" th:value="${item.quantity}"
+												min="1" th:max="${item.product.stock}" />
+											<button type="submit" class="btn btn-outline-primary" title="Actualizar">
+												<i class="fas fa-sync-alt"></i>
+											</button>
+										</div>
+										<small class="text-muted">Stock: <span th:text="${item.product.stock}"></span></small>
+									</form>
+								</div>
+
+								<!-- Subtotal y acciones -->
+								<div class="col-md-2 text-end">
+									<small class="text-muted d-block">Subtotal</small>
+									<div class="fw-bold text-success mb-3" th:if="${item.product.detailProduct?.price}">
+										<span
+											th:text="'S/ ' + ${#numbers.formatDecimal((item.product.detailProduct.price * (1 - item.product.detailProduct.discount / 100.0)) * item.quantity, 1, 2)}"></span>
+									</div>
+									<form th:action="@{/web/cart/remove/{id}(id=${item.id})}" method="post"
+										style="display: inline">
+										<button type="submit" class="btn btn-outline-danger btn-sm"
+											onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+											<i class="fas fa-trash"></i>
+										</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Resumen del pedido -->
+				<div class="col-lg-4">
+					<div class="card shadow-hover sticky-top" style="top: 20px;">
+						<div class="card-header bg-primary text-white">
+							<h5 class="mb-0"><i class="fas fa-file-invoice"></i> Resumen del Pedido</h5>
+						</div>
+						<div class="card-body">
+							<div class="d-flex justify-content-between mb-2">
+								<span>Items:</span>
+								<span class="fw-bold" th:text="${totalItems}"></span>
+							</div>
+							<div class="d-flex justify-content-between mb-2">
+								<span>Subtotal:</span>
+								<span th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal, 1, 2)}"></span>
+							</div>
+							<div class="d-flex justify-content-between mb-2">
+								<span>IGV (18%):</span>
+								<span th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal * 0.18, 1, 2)}"></span>
+							</div>
+							<hr />
+							<div class="d-flex justify-content-between fs-5 fw-bold">
+								<span>Total:</span>
+								<span class="text-success"
+									th:text="'S/ ' + ${#numbers.formatDecimal(cartTotal * 1.18, 1, 2)}"></span>
+							</div>
+						</div>
+						<div class="card-footer bg-light">
+							<a href="/web/orders/checkout" class="btn btn-success w-100 mb-2">
+								<i class="fas fa-credit-card"></i> Proceder al Pago
+							</a>
+							<a th:href="@{/web/products}" class="btn btn-outline-primary w-100 mb-2">
+								<i class="fas fa-store"></i> Seguir Comprando
+							</a>
+							<form action="/web/cart/clear" method="post">
+								<button type="submit" class="btn btn-outline-danger w-100"
+									onclick="return confirm('¿Estás seguro de limpiar todo el carrito?')">
+									<i class="fas fa-trash"></i> Limpiar Carrito
+								</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<div th:replace="~{fragments/login-modal :: loginModal}"></div>
+	<div th:replace="~{fragments/register-modal :: registerModal}"></div>
+	<div th:replace="~{fragments/scripts :: scripts(null)}"></div>
+
+	<!-- Cart Local Script -->
+	<script th:src="@{/js/cart-local.js}"></script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		const isLocalCart = /*[[${isLocalCart}]]*/ false;
+		const isAuthenticated = /*[[${isAuthenticated}]]*/ false;
+
+		// Si no está autenticado, renderizar carrito desde localStorage
+		if (isLocalCart && !isAuthenticated) {
+			renderLocalCart();
+		}
+
+		function renderLocalCart() {
+			const cart = CartLocal.getCart();
+			const container = document.querySelector('.container-fluid');
+
+			if (cart.length === 0) {
+				// El carrito está vacío (ya renderizado por Thymeleaf)
+				return;
+			}
+
+			// Crear estructura HTML para mostrar los items
+			const cartSection = document.createElement('div');
+			cartSection.className = 'row';
+
+			let cartHTML = `
+				<div class="col-lg-8">
+					<h4 class="mb-3">Tu carrito (desde navegador)</h4>
+					<div class="alert alert-info">
+						<i class="fas fa-info-circle"></i> 
+						Los productos se guardarán permanentemente cuando inicies sesión.
+					</div>
+			`;
+
+			// Renderizar cada item
+			cart.forEach(item => {
+				const itemPrice = item.discount > 0
+					? item.price * (1 - item.discount / 100)
+					: item.price;
+				const subtotal = itemPrice * item.quantity;
+
+				cartHTML += `
+					<div class="card shadow-hover mb-3" data-product-id="${item.productId}">
+						<div class="card-body">
+							<div class="row align-items-center">
+								<div class="col-md-2">
+									<img src="${item.imageUrl || '/images/no-image.png'}" 
+										 class="img-fluid rounded" 
+										 alt="${item.productName}">
+								</div>
+								<div class="col-md-4">
+									<h6 class="mb-1">${item.productName}</h6>
+									${item.discount > 0 ? `
+										<div>
+											<span class="text-muted text-decoration-line-through">S/ ${item.price.toFixed(2)}</span>
+											<span class="text-danger fw-bold ms-2">-${item.discount}%</span>
+										</div>
+										<div class="text-success fw-bold">S/ ${itemPrice.toFixed(2)}</div>
+									` : `
+										<div class="fw-bold">S/ ${item.price.toFixed(2)}</div>
+									`}
+								</div>
+								<div class="col-md-3">
+									<div class="input-group input-group-sm">
+										<button class="btn btn-outline-secondary" 
+												onclick="updateLocalQuantity(${item.productId}, ${item.quantity - 1})">
+											<i class="fas fa-minus"></i>
+										</button>
+										<input type="number" 
+											   class="form-control text-center" 
+											   value="${item.quantity}" 
+											   min="1" 
+											   readonly>
+										<button class="btn btn-outline-secondary" 
+												onclick="updateLocalQuantity(${item.productId}, ${item.quantity + 1})">
+											<i class="fas fa-plus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="col-md-2 text-end">
+									<div class="fw-bold">S/ ${subtotal.toFixed(2)}</div>
+								</div>
+								<div class="col-md-1 text-end">
+									<button class="btn btn-sm btn-outline-danger" 
+											onclick="removeLocalItem(${item.productId})">
+										<i class="fas fa-trash"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				`;
+			});
+
+			cartHTML += `</div>`;
+
+			// Sección de resumen
+			const total = CartLocal.getTotal();
+			const totalItems = CartLocal.getTotalItems();
+
+			cartHTML += `
+				<div class="col-lg-4">
+					<div class="card shadow-hover sticky-top" style="top: 20px;">
+						<div class="card-body">
+							<h5 class="card-title mb-3">Resumen del Pedido</h5>
+							<div class="d-flex justify-content-between mb-2">
+								<span>Subtotal (${totalItems} items):</span>
+								<span>S/ ${total.toFixed(2)}</span>
+							</div>
+							<hr>
+							<div class="d-flex justify-content-between mb-3">
+								<strong>Total:</strong>
+								<strong class="text-primary">S/ ${total.toFixed(2)}</strong>
+							</div>
+							<div class="alert alert-warning">
+								<i class="fas fa-exclamation-triangle"></i>
+								Inicia sesión para proceder con la compra
+							</div>
+							<button class="btn btn-primary w-100 mb-2" 
+									data-bs-toggle="modal" 
+									data-bs-target="#loginModal">
+								<i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+							</button>
+							<button class="btn btn-outline-secondary w-100" 
+									onclick="clearLocalCart()">
+								<i class="fas fa-trash"></i> Vaciar Carrito
+							</button>
+						</div>
+					</div>
+				</div>
+			`;
+
+			cartSection.innerHTML = cartHTML;
+
+			// Reemplazar el contenido actual
+			const existingContent = container.querySelector('.row');
+			if (existingContent) {
+				existingContent.replaceWith(cartSection);
+			}
+		}
+
+		function updateLocalQuantity(productId, newQuantity) {
+			if (newQuantity < 1) {
+				removeLocalItem(productId);
+				return;
+			}
+			CartLocal.updateQuantity(productId, newQuantity);
+			renderLocalCart();
+		}
+
+		function removeLocalItem(productId) {
+			if (confirm('¿Eliminar este producto del carrito?')) {
+				CartLocal.removeItem(productId);
+				renderLocalCart();
+
+				// Si el carrito queda vacío, recargar para mostrar mensaje
+				if (CartLocal.getCart().length === 0) {
+					location.reload();
+				}
+			}
+		}
+
+		function clearLocalCart() {
+			if (confirm('¿Estás seguro de que deseas vaciar el carrito?')) {
+				CartLocal.clearCart();
+				location.reload();
+			}
+		}
+		/*]]>*/
+	</script>
+</body>
+
+</html>

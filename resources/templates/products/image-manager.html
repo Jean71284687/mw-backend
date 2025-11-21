@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <div th:replace="~{fragments/head :: head('Gestión de Imágenes')}"></div>
+   <style>
+      .image-upload-container {
+         border: 2px dashed #ddd;
+         border-radius: 8px;
+         padding: 2rem;
+         text-align: center;
+         margin-bottom: 2rem;
+         transition: border-color 0.3s ease;
+      }
+
+      .image-upload-container:hover {
+         border-color: #007bff;
+      }
+
+      .image-upload-container.dragover {
+         border-color: #007bff;
+         background-color: #f8f9fa;
+      }
+
+      .image-preview {
+         position: relative;
+         display: inline-block;
+         margin: 0.5rem;
+      }
+
+      .image-preview img {
+         width: 150px;
+         height: 150px;
+         object-fit: cover;
+         border-radius: 8px;
+         border: 2px solid #ddd;
+      }
+
+      .image-preview.primary img {
+         border-color: #28a745;
+         border-width: 3px;
+      }
+
+      .image-preview .image-actions {
+         position: absolute;
+         top: 5px;
+         right: 5px;
+         display: flex;
+         gap: 5px;
+      }
+
+      .image-preview .badge {
+         position: absolute;
+         bottom: 5px;
+         left: 50%;
+         transform: translateX(-50%);
+      }
+
+      .btn-sm {
+         padding: 0.25rem 0.4rem;
+         font-size: 0.75rem;
+      }
+   </style>
+</head>
+
+<body>
+   <div
+      th:replace="~{fragments/navbar :: navbar('products', ${categories}, ${cartCount}, ${isAuthenticated}, ${username})}">
+   </div>
+
+   <div class="container mt-4">
+      <div class="row">
+         <div class="col-12">
+            <h2>Gestión de Imágenes de Productos</h2>
+            <p class="text-muted">Sube y gestiona las imágenes de tus productos</p>
+         </div>
+      </div>
+
+      <!-- Selector de Producto -->
+      <div class="row mb-4">
+         <div class="col-md-6">
+            <label for="productSelect" class="form-label">Seleccionar Producto:</label>
+            <select class="form-select" id="productSelect">
+               <option value="">Selecciona un producto...</option>
+               <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.name}">
+                  Producto
+               </option>
+            </select>
+         </div>
+      </div>
+
+      <!-- Área de Subida de Imágenes -->
+      <div class="row mb-4" id="uploadSection" style="display: none;">
+         <div class="col-12">
+            <div class="image-upload-container" id="uploadContainer">
+               <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+               <h5>Arrastra las imágenes aquí o haz clic para seleccionar</h5>
+               <p class="text-muted">Formatos soportados: JPG, PNG, GIF (máx. 5MB por imagen)</p>
+               <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+               <button type="button" class="btn btn-primary" onclick="document.getElementById('imageInput').click()">
+                  <i class="fas fa-plus"></i> Seleccionar Imágenes
+               </button>
+            </div>
+         </div>
+      </div>
+
+      <!-- Vista Previa de Imágenes -->
+      <div class="row" id="imagePreviewSection" style="display: none;">
+         <div class="col-12">
+            <h4>Imágenes del Producto</h4>
+            <div id="imagePreviewContainer" class="d-flex flex-wrap">
+               <!-- Las imágenes se cargarán aquí dinámicamente -->
+            </div>
+         </div>
+      </div>
+
+      <!-- Mensajes -->
+      <div id="messageContainer"></div>
+   </div>
+
+   <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+   <script>
+      let currentProductId = null;
+
+      // Inicializar eventos
+      document.addEventListener('DOMContentLoaded', function () {
+         initializeEventListeners();
+      });
+
+      function initializeEventListeners() {
+         const productSelect = document.getElementById('productSelect');
+         const imageInput = document.getElementById('imageInput');
+         const uploadContainer = document.getElementById('uploadContainer');
+
+         // Cambio de producto
+         productSelect.addEventListener('change', function () {
+            currentProductId = this.value;
+            if (currentProductId) {
+               showUploadSection();
+               loadProductImages();
+            } else {
+               hideUploadSection();
+            }
+         });
+
+         // Subida de archivos
+         imageInput.addEventListener('change', function () {
+            handleFiles(this.files);
+         });
+
+         // Drag and drop
+         uploadContainer.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+         });
+
+         uploadContainer.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+         });
+
+         uploadContainer.addEventListener('drop', function (e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+         });
+
+         uploadContainer.addEventListener('click', function () {
+            imageInput.click();
+         });
+      }
+
+      function showUploadSection() {
+         document.getElementById('uploadSection').style.display = 'block';
+         document.getElementById('imagePreviewSection').style.display = 'block';
+      }
+
+      function hideUploadSection() {
+         document.getElementById('uploadSection').style.display = 'none';
+         document.getElementById('imagePreviewSection').style.display = 'none';
+      }
+
+      function handleFiles(files) {
+         if (!currentProductId) {
+            showMessage('Por favor selecciona un producto primero.', 'warning');
+            return;
+         }
+
+         Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+               uploadImage(file);
+            } else {
+               showMessage(`El archivo ${file.name} no es una imagen válida.`, 'warning');
+            }
+         });
+      }
+
+      async function uploadImage(file) {
+         const formData = new FormData();
+         formData.append('file', file);
+         formData.append('altText', file.name);
+         formData.append('isPrimary', 'false');
+
+         try {
+            showMessage('Subiendo imagen...', 'info');
+
+            const response = await fetch(`/api/products/${currentProductId}/images`, {
+               method: 'POST',
+               body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+               showMessage('Imagen subida exitosamente', 'success');
+               loadProductImages(); // Recargar las imágenes
+            } else {
+               showMessage(result.error || 'Error al subir la imagen', 'danger');
+            }
+         } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error al subir la imagen', 'danger');
+         }
+      }
+
+      async function loadProductImages() {
+         if (!currentProductId) return;
+
+         try {
+            const response = await fetch(`/api/products/${currentProductId}/images`);
+            const result = await response.json();
+
+            if (result.success) {
+               displayImages(result.images);
+            } else {
+               showMessage('Error al cargar las imágenes', 'danger');
+            }
+         } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error al cargar las imágenes', 'danger');
+         }
+      }
+
+      function displayImages(images) {
+         const container = document.getElementById('imagePreviewContainer');
+         container.innerHTML = '';
+
+         images.forEach(image => {
+            const imageDiv = document.createElement('div');
+            imageDiv.className = `image-preview ${image.isPrimary ? 'primary' : ''}`;
+
+            imageDiv.innerHTML = `
+                    <img src="${image.imageUrl}" alt="${image.altText || 'Imagen del producto'}">
+                    <div class="image-actions">
+                        ${!image.isPrimary ? `<button class="btn btn-success btn-sm" onclick="setPrimaryImage(${image.id})" title="Establecer como principal">
+                            <i class="fas fa-star"></i>
+                        </button>` : ''}
+                        <button class="btn btn-danger btn-sm" onclick="deleteImage(${image.id})" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    ${image.isPrimary ? '<span class="badge bg-success">Principal</span>' : ''}
+                `;
+
+            container.appendChild(imageDiv);
+         });
+      }
+
+      async function setPrimaryImage(imageId) {
+         try {
+            const response = await fetch(`/api/products/${currentProductId}/images/${imageId}/primary`, {
+               method: 'PUT'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+               showMessage('Imagen establecida como principal', 'success');
+               loadProductImages();
+            } else {
+               showMessage(result.error || 'Error al establecer imagen principal', 'danger');
+            }
+         } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error al establecer imagen principal', 'danger');
+         }
+      }
+
+      async function deleteImage(imageId) {
+         if (!confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
+            return;
+         }
+
+         try {
+            const response = await fetch(`/api/products/${currentProductId}/images/${imageId}`, {
+               method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+               showMessage('Imagen eliminada exitosamente', 'success');
+               loadProductImages();
+            } else {
+               showMessage(result.error || 'Error al eliminar la imagen', 'danger');
+            }
+         } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error al eliminar la imagen', 'danger');
+         }
+      }
+
+      function showMessage(message, type) {
+         const container = document.getElementById('messageContainer');
+         const alert = document.createElement('div');
+         alert.className = `alert alert-${type} alert-dismissible fade show`;
+         alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+         container.appendChild(alert);
+
+         // Auto-dismiss después de 5 segundos
+         setTimeout(() => {
+            if (alert.parentNode) {
+               alert.remove();
+            }
+         }, 5000);
+      }
+   </script>
+</body>
+
+</html>

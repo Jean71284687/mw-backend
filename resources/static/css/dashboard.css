@@ -1,0 +1,241 @@
+body {
+	overflow-x: hidden;
+	font-family: 'Muli', sans-serif;
+	font-weight: 300;
+	color: var(--primary-color);
+}
+/* El cuerpo toma los colores oscuros por defecto */
+body.dark-mode {
+	background-color: #121212 !important; /* OK */
+	color: #e0e0e0 !important; /* CRUCIAL: Asegura que el texto general sea claro */
+}
+a {
+	text-decoration: none;
+}
+.bg-primary {
+	background-color: var(--primary-color) !important;
+}
+.bg-light {
+	background-color: var(--light) !important;
+}
+
+/* ------------------------------------------------ */
+/* ESTILOS DE BARRA DE BÚSQUEDA */
+/* ------------------------------------------------ */
+
+/* El ícono de búsqueda dentro del span.input-group-text */
+.input-group-text .btn i {
+	color: #555 !important; /* Color gris oscuro para la lupa en modo claro */
+}
+
+/* El span que envuelve el botón */
+.input-group-text {
+	/* Quitar el borde del span para que se vea como parte del input */
+	border-left: none !important;
+	border-color: #ddd !important;
+	background-color: transparent !important;
+}
+
+/* Modo Oscuro */
+body.dark-mode .input-group-text .btn i {
+	color: #ccc !important; /* Color claro para la lupa en modo oscuro */
+}
+
+body.dark-mode .input-group-text {
+	background-color: #121212 !important; /* Mismo color del navbar/input */
+	border-color: #333 !important;
+}
+
+body.dark-mode .form-control {
+	background-color: #121212 !important;
+	border-color: #333 !important;
+	color: #e0e0e0 !important;
+}
+
+#sidebar-container {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1000;
+	height: 100%;
+
+	/* DEFINIMOS UN ANCHO FIJO */
+	width: 250px; /* Actualizado para coincidir con el HTML */
+
+	overflow-y: auto;
+}
+
+/* ------------------------------------------------ */
+/* COMPENSACIÓN DEL CONTENIDO PRINCIPAL */
+/* ------------------------------------------------ */
+
+/* Necesitas desplazar el contenido principal hacia la derecha
+   para que no quede oculto detrás del menú fijo. */
+#main-content {
+	/* El margen izquierdo debe ser igual al ancho de la sidebar */
+	margin-left: 250px;
+}
+.logo {
+	text-align: center;
+	padding: 20px 0;
+}
+#sidebar-container .logo {
+	padding: 0.875rem 1.25rem;
+}
+#sidebar-container .menu {
+	width: 10rem;
+}
+.ms-auto {
+	margin-left: auto !important;
+}
+.avatar {
+	max-width: 35px;
+}
+
+/* ------------------------------------------------ */
+/* ESTILOS DEL MODO OSCURO */
+/* ------------------------------------------------ */
+
+/* Cualquier otro fondo que no sea la sidebar debe cambiar */
+body.dark-mode .bg-light {
+	/* Si tienes un navbar claro o un contenedor claro */
+	background-color: #1e1e1e !important;
+	border-color: #333 !important;
+}
+
+/* Si tienes un contenedor principal (no sidebar) con fondo blanco */
+body.dark-mode .main-content-area {
+	background-color: #1e1e1e !important;
+}
+
+/* Puedes cambiar el color de tu sidebar si quieres que sea diferente */
+body.dark-mode #sidebar-container.bg-primary {
+	background-color: #004d40 !important; /* Un verde oscuro, por ejemplo */
+	color: #e0e0e0 !important;
+}
+body.dark-mode .navbar .user-info {
+	color: #00ffcc !important; /* Cambia tu nombreal color que quieras y en negrita*/
+}
+/* Si usas tarjetas o cajas de contenido (como en tu dashboard) */
+body.dark-mode .card {
+	background-color: #1e1e1e !important;
+	color: #e0e0e0 !important;
+	border-color: #333 !important;
+}
+
+/* ----- Estilos para el contenido principal ----- */
+
+/* Texto general en el contenido */
+.main-content-area,
+.main-content-area h5,
+.main-content-area p,
+.main-content-area td,
+.main-content-area th {
+	color: #212529 !important; /* negro para modo claro */
+}
+
+body.dark-mode .main-content-area,
+body.dark-mode .main-content-area h5,
+body.dark-mode .main-content-area p,
+body.dark-mode .main-content-area td,
+body.dark-mode .main-content-area th {
+	color: #e0e0e0 !important; /* gris claro para modo oscuro */
+}
+
+/* Forzar que las cards se adapten */
+.card {
+	background-color: #ffffff !important;
+	color: #212529 !important;
+	border: 1px solid #ddd;
+}
+
+body.dark-mode .card {
+	background-color: #1e1e1e !important;
+	color: #e0e0e0 !important;
+	border-color: #333 !important;
+}
+
+/* Ajuste para la tabla */
+.table {
+	color: inherit !important;
+}
+
+body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
+	background-color: #2a2a2a !important;
+}
+
+body.dark-mode .table-striped > tbody > tr:nth-of-type(even) {
+	background-color: #1e1e1e !important;
+}
+
+/* Ajuste de labels de Chart.js */
+body.dark-mode canvas {
+	color: #e0e0e0 !important;
+}
+
+/* ------------------------------------------------ */
+/* ESTILOS PARA SIDEBAR COLAPSABLE */
+/* ------------------------------------------------ */
+
+/* Estado colapsado del sidebar */
+#sidebar-container.collapsed {
+	width: 60px;
+	transition: width 0.3s ease;
+}
+
+/* Ajustar contenido principal cuando sidebar está colapsado */
+body.sidebar-collapsed #main-content {
+	margin-left: 60px;
+	transition: margin-left 0.3s ease;
+}
+
+/* Ocultar texto del menú cuando está colapsado */
+#sidebar-container.collapsed .menu a span {
+	display: none;
+}
+
+/* Ocultar logo text cuando está colapsado */
+#sidebar-container.collapsed .logo a {
+	font-size: 0;
+}
+
+/* Mostrar solo el ícono del logo cuando está colapsado */
+#sidebar-container.collapsed .logo a i {
+	font-size: 1.5rem;
+}
+
+/* Centrar íconos cuando está colapsado */
+#sidebar-container.collapsed .menu a {
+	text-align: center;
+	padding: 15px 10px !important;
+}
+
+/* Hacer que el contenido principal tenga transición suave */
+#main-content {
+	transition: margin-left 0.3s ease;
+}
+
+/* Botón toggle del sidebar */
+.sidebar-toggle {
+	background: none;
+	border: none;
+	color: #495057;
+	font-size: 1.2rem;
+	padding: 8px 12px;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+	color: #007bff;
+}
+
+/* Modo oscuro para el botón toggle */
+body.dark-mode .sidebar-toggle {
+	color: #e0e0e0;
+}
+
+body.dark-mode .sidebar-toggle:hover {
+	color: #00ffcc;
+}
